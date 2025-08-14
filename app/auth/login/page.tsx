@@ -56,11 +56,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background-primary via-background-secondary to-background-tertiary flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#0d1117] via-[#161b22] to-[#21262d] flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-accent-purple/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent-blue/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-green/10 rounded-full blur-3xl animate-pulse delay-2000" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#8b5cf6]/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#3b82f6]/20 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#10b981]/10 rounded-full blur-3xl animate-pulse delay-2000" />
       </div>
 
       <div className="w-full max-w-md relative z-10">
@@ -104,7 +104,7 @@ export default function LoginPage() {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-accent-purple/50 focus:ring-accent-purple/20"
+                  className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-[#8b5cf6]/50 focus:ring-[#8b5cf6]/20"
                   required
                 />
               </div>
@@ -120,7 +120,7 @@ export default function LoginPage() {
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-accent-purple/50 focus:ring-accent-purple/20 pr-10"
+                    className="bg-white/5 border-white/20 text-white placeholder:text-gray-400 focus:border-[#8b5cf6]/50 focus:ring-[#8b5cf6]/20 pr-10"
                     required
                   />
                   <Button
@@ -138,7 +138,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Link
                   href="/auth/forgot-password"
-                  className="text-sm text-accent-purple hover:text-accent-purple-secondary transition-colors"
+                  className="text-sm text-[#8b5cf6] hover:text-[#7c3aed] transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -178,7 +178,7 @@ export default function LoginPage() {
                 Don't have an account?{" "}
                 <Link
                   href="/auth/register"
-                  className="text-accent-purple hover:text-accent-purple-secondary transition-colors font-medium"
+                  className="text-[#8b5cf6] hover:text-[#7c3aed] transition-colors font-medium"
                 >
                   Sign up
                 </Link>
