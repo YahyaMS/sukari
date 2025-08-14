@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { Icon3D } from "@/components/ui/3d-icon"
 import {
   MessageCircle,
   Video,
@@ -225,72 +226,87 @@ export default function CoachingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
+      {/* Floating Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-full blur-lg animate-bounce"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl animate-bounce"></div>
+      </div>
+
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b">
+      <header className="glass-card border-b border-white/10 relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <div className="flex items-center space-x-2">
-              <MessageCircle className="h-6 w-6 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">My Coach</h1>
+            <div className="flex items-center space-x-3">
+              <Icon3D shape="sphere" color="blue" size="sm" icon={MessageCircle} />
+              <h1 className="text-2xl font-bold text-white">My Coach</h1>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Coach Profile Sidebar */}
           <div className="lg:col-span-1">
-            <Card>
+            <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader className="text-center">
-                <Avatar className="w-24 h-24 mx-auto mb-4">
-                  <AvatarImage src={coach.avatar || "/placeholder.svg"} alt={coach.name} />
-                  <AvatarFallback>SJ</AvatarFallback>
-                </Avatar>
-                <CardTitle>{coach.name}</CardTitle>
-                <CardDescription>{coach.title}</CardDescription>
+                <div className="relative">
+                  <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-purple-500/30">
+                    <AvatarImage src={coach.avatar || "/placeholder.svg"} alt={coach.name} />
+                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white text-xl">
+                      SJ
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Online</Badge>
+                  </div>
+                </div>
+                <CardTitle className="text-white text-xl">{coach.name}</CardTitle>
+                <CardDescription className="text-text-secondary">{coach.title}</CardDescription>
                 <div className="flex items-center justify-center space-x-1 mt-2">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-medium">{coach.rating}</span>
-                  <span className="text-gray-600">({coach.experience})</span>
+                  <span className="font-medium text-white">{coach.rating}</span>
+                  <span className="text-text-secondary">({coach.experience})</span>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-medium mb-2">Specializations</h4>
+                  <h4 className="font-medium mb-2 text-white">Specializations</h4>
                   <div className="flex flex-wrap gap-2">
                     {coach.specializations.map((spec) => (
-                      <Badge key={spec} variant="secondary">
+                      <Badge key={spec} className="bg-accent-purple/20 text-accent-purple border-accent-purple/30">
                         {spec}
                       </Badge>
                     ))}
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-white/10" />
 
                 <div className="space-y-2">
-                  <div className="flex items-center space-x-2 text-sm">
-                    <Clock className="h-4 w-4 text-gray-500" />
+                  <div className="flex items-center space-x-2 text-sm text-text-secondary">
+                    <Clock className="h-4 w-4" />
                     <span>{coach.responseTime}</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-sm">
-                    <Calendar className="h-4 w-4 text-gray-500" />
+                  <div className="flex items-center space-x-2 text-sm text-text-secondary">
+                    <Calendar className="h-4 w-4" />
                     <span>Next available: {coach.nextAvailable}</span>
                   </div>
                 </div>
 
-                <Separator />
+                <Separator className="bg-white/10" />
 
                 <div className="space-y-2">
                   <Button
-                    className="w-full"
+                    className="w-full gradient-primary hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
                     size="sm"
                     onClick={() => {
                       setScheduleType("video")
@@ -302,7 +318,7 @@ export default function CoachingPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full bg-transparent"
+                    className="w-full glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
                     size="sm"
                     onClick={() => {
                       setScheduleType("phone")
@@ -317,14 +333,17 @@ export default function CoachingPage() {
             </Card>
 
             {/* Quick Actions */}
-            <Card className="mt-6">
+            <Card className="mt-6 glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
+                <CardTitle className="text-lg text-white flex items-center gap-2">
+                  <Icon3D shape="cube" color="green" size="sm" icon={Calendar} />
+                  Quick Actions
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button
                   variant="outline"
-                  className="w-full justify-start bg-transparent"
+                  className="w-full justify-start glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
                   size="sm"
                   onClick={() => setLabResultsModalOpen(true)}
                 >
@@ -333,7 +352,7 @@ export default function CoachingPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start bg-transparent"
+                  className="w-full justify-start glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
                   size="sm"
                   onClick={() => setProgressPhotoModalOpen(true)}
                 >
@@ -342,7 +361,7 @@ export default function CoachingPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full justify-start bg-transparent"
+                  className="w-full justify-start glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
                   size="sm"
                   onClick={handleViewCarePlan}
                 >
@@ -355,16 +374,14 @@ export default function CoachingPage() {
 
           {/* Chat Interface */}
           <div className="lg:col-span-2">
-            <Card className="h-[600px] flex flex-col">
+            <Card className="h-[600px] flex flex-col glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Chat with {coach.name}</CardTitle>
-                    <CardDescription>Secure, HIPAA-compliant messaging</CardDescription>
+                    <CardTitle className="text-white">Chat with {coach.name}</CardTitle>
+                    <CardDescription className="text-text-secondary">Secure, HIPAA-compliant messaging</CardDescription>
                   </div>
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
-                    Online
-                  </Badge>
+                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Online</Badge>
                 </div>
               </CardHeader>
 
@@ -377,7 +394,9 @@ export default function CoachingPage() {
                   >
                     <div
                       className={`max-w-[70%] rounded-lg p-3 ${
-                        message.senderType === "user" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"
+                        message.senderType === "user"
+                          ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg shadow-purple-500/25"
+                          : "glass-card border-white/10 text-white"
                       }`}
                     >
                       {message.type === "text" && <p>{message.content}</p>}
@@ -388,7 +407,9 @@ export default function CoachingPage() {
                         </div>
                       )}
                       <p
-                        className={`text-xs mt-1 ${message.senderType === "user" ? "text-blue-100" : "text-gray-500"}`}
+                        className={`text-xs mt-1 ${
+                          message.senderType === "user" ? "text-purple-100" : "text-text-secondary"
+                        }`}
                       >
                         {formatTime(message.timestamp)}
                       </p>
@@ -398,15 +419,15 @@ export default function CoachingPage() {
               </CardContent>
 
               {/* Message Input */}
-              <div className="p-4 border-t">
+              <div className="p-4 border-t border-white/10">
                 <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                     <Paperclip className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                     <ImageIcon className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                     <Mic className="h-4 w-4" />
                   </Button>
                   <Input
@@ -414,9 +435,13 @@ export default function CoachingPage() {
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                    className="flex-1"
+                    className="flex-1 glass-input border-white/20 text-white placeholder:text-text-secondary"
                   />
-                  <Button onClick={handleSendMessage} disabled={!newMessage.trim()}>
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim()}
+                    className="gradient-primary hover:shadow-lg hover:shadow-purple-500/25 transition-all duration-300"
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>

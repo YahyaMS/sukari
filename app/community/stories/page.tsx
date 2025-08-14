@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ShareStoryModal } from "@/components/community/share-story-modal"
+import { Icon3D } from "@/components/ui/3d-icon"
 
 export default function SuccessStoriesPage() {
   const [filterCategory, setFilterCategory] = useState("all")
@@ -153,24 +154,33 @@ export default function SuccessStoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-full blur-lg animate-bounce"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl animate-bounce"></div>
+      </div>
+
+      <div className="glass-card border-b border-white/10 relative z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link href="/community">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Success Stories</h1>
-                <p className="text-sm text-gray-600">Inspiring journeys from our community</p>
+              <div className="flex items-center gap-3">
+                <Icon3D shape="torus" color="orange" size="sm" icon={Trophy} />
+                <div>
+                  <h1 className="text-2xl font-bold text-white">Success Stories</h1>
+                  <p className="text-sm text-text-secondary">Inspiring journeys from our community</p>
+                </div>
               </div>
             </div>
             <ShareStoryModal>
-              <Button>
+              <Button className="gradient-primary">
                 <Trophy className="h-4 w-4 mr-2" />
                 Share Your Story
               </Button>
@@ -179,15 +189,14 @@ export default function SuccessStoriesPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Filters */}
+      <div className="max-w-4xl mx-auto px-4 py-8 relative z-10">
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-full md:w-48">
+            <SelectTrigger className="w-full md:w-48 glass-input border-white/20 text-white">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Filter by category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="glass-card border-white/20">
               <SelectItem value="all">All Stories</SelectItem>
               <SelectItem value="weight-loss">Weight Loss</SelectItem>
               <SelectItem value="diabetes">Diabetes Management</SelectItem>
@@ -197,26 +206,28 @@ export default function SuccessStoriesPage() {
           </Select>
 
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full md:w-48">
+            <SelectTrigger className="w-full md:w-48 glass-input border-white/20 text-white">
               <TrendingUp className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="glass-card border-white/20">
               <SelectItem value="recent">Most Recent</SelectItem>
               <SelectItem value="popular">Most Popular</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Success Stories */}
         <div className="space-y-8">
           {sortedStories.map((story) => (
-            <Card key={story.id} className="overflow-hidden">
+            <Card
+              key={story.id}
+              className="glass-card border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden"
+            >
               <CardHeader>
                 <div className="flex items-start gap-4">
-                  <Avatar className="h-12 w-12">
+                  <Avatar className="h-12 w-12 ring-2 ring-accent-purple/30">
                     <AvatarImage src={story.avatar || "/placeholder.svg"} />
-                    <AvatarFallback>
+                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white">
                       {story.user
                         .split(" ")
                         .map((n) => n[0])
@@ -225,19 +236,19 @@ export default function SuccessStoriesPage() {
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-gray-900">{story.user}</h3>
+                      <h3 className="font-semibold text-white">{story.user}</h3>
                       {story.verified && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge className="text-xs bg-accent-green/20 text-accent-green border-accent-green/30">
                           ✓ Verified
                         </Badge>
                       )}
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge className="text-xs bg-accent-purple/20 text-accent-purple border-accent-purple/30">
                         {story.badge}
                       </Badge>
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">{story.title}</h2>
-                    <p className="text-lg font-medium text-green-600 mb-2">{story.achievement}</p>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <h2 className="text-xl font-bold text-white mb-2">{story.title}</h2>
+                    <p className="text-lg font-medium text-accent-green mb-2">{story.achievement}</p>
+                    <div className="flex items-center gap-2 text-sm text-text-secondary">
                       <Calendar className="h-4 w-4" />
                       <span>{story.datePosted}</span>
                     </div>
@@ -247,44 +258,48 @@ export default function SuccessStoriesPage() {
 
               <CardContent>
                 <div className="prose prose-gray max-w-none mb-6">
-                  <p className="text-gray-700 leading-relaxed">{story.story}</p>
+                  <p className="text-text-primary leading-relaxed">{story.story}</p>
                 </div>
 
-                {/* Metrics */}
-                <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                  <h4 className="font-semibold text-gray-900 mb-3">Key Achievements</h4>
+                <div className="glass-card border-white/10 rounded-lg p-4 mb-6">
+                  <h4 className="font-semibold text-white mb-3">Key Achievements</h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {Object.entries(story.metrics).map(([key, value]) => (
                       <div key={key} className="text-center">
-                        <div className="text-lg font-bold text-blue-600">{value}</div>
-                        <div className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, " $1").trim()}</div>
+                        <div className="text-lg font-bold text-accent-blue">{value}</div>
+                        <div className="text-sm text-text-secondary capitalize">
+                          {key.replace(/([A-Z])/g, " $1").trim()}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Engagement */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <div className="flex items-center gap-6">
                     <button
                       onClick={() => handleLike(story.id)}
                       className={`flex items-center gap-2 transition-colors ${
-                        storyLikes[story.id] ? "text-red-600" : "text-gray-600 hover:text-red-600"
+                        storyLikes[story.id] ? "text-red-400" : "text-text-secondary hover:text-red-400"
                       }`}
                     >
                       <Heart className={`h-5 w-5 ${storyLikes[story.id] ? "fill-current" : ""}`} />
                       <span>{storyCounts[story.id]?.likes || story.likes}</span>
                     </button>
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors">
+                    <button className="flex items-center gap-2 text-text-secondary hover:text-accent-blue transition-colors">
                       <MessageCircle className="h-5 w-5" />
                       <span>{storyCounts[story.id]?.comments || story.comments}</span>
                     </button>
-                    <button className="flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors">
+                    <button className="flex items-center gap-2 text-text-secondary hover:text-accent-green transition-colors">
                       <Share className="h-5 w-5" />
                       <span>{storyCounts[story.id]?.shares || story.shares}</span>
                     </button>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
+                  >
                     Read Comments
                   </Button>
                 </div>
@@ -293,16 +308,17 @@ export default function SuccessStoriesPage() {
           ))}
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center mt-12 p-8 bg-blue-50 rounded-lg">
-          <Trophy className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Have a Success Story to Share?</h3>
-          <p className="text-gray-600 mb-4">
+        <div className="text-center mt-12 p-8 glass-card border-white/10 rounded-lg">
+          <Icon3D shape="torus" color="orange" size="lg" icon={Trophy} />
+          <h3 className="text-xl font-bold text-white mb-2 mt-4">Have a Success Story to Share?</h3>
+          <p className="text-text-secondary mb-4">
             Your journey could inspire and help others in the community. Share your achievements and be part of the
             motivation that drives others to succeed.
           </p>
           <ShareStoryModal>
-            <Button size="lg">Share Your Success Story</Button>
+            <Button size="lg" className="gradient-primary">
+              Share Your Success Story
+            </Button>
           </ShareStoryModal>
         </div>
       </div>

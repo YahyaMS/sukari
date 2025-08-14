@@ -117,28 +117,35 @@ export default function GlucoseTrackingPage() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="glass-card border-b border-white/10 sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-full blur-lg animate-bounce"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl animate-bounce"></div>
+      </div>
+
+      <header className="glass-card border-b border-white/10 sticky top-0 z-50 relative">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
             <div className="flex items-center space-x-3">
               <Icon3D shape="sphere" color="blue" size="lg" glow />
-              <h1 className="text-2xl font-bold text-text-primary">Glucose Tracking</h1>
+              <h1 className="text-2xl font-bold text-white">Glucose Tracking</h1>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8">
+      <main className="container mx-auto px-6 py-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-8">
-          <ElevatedCard className="animate-fade-in-up">
+          <ElevatedCard className="glass-card border-white/10 hover:border-white/20 transition-all duration-300 animate-fade-in-up">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-text-primary">
+              <CardTitle className="flex items-center gap-3 text-white">
                 <Icon3D shape="sphere" color="blue" size="md" />
                 Log Glucose Reading
               </CardTitle>
@@ -149,7 +156,7 @@ export default function GlucoseTrackingPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-3">
-                  <Label htmlFor="glucose" className="text-text-secondary font-medium">
+                  <Label htmlFor="glucose" className="text-white font-medium">
                     Glucose Level (mg/dL)
                   </Label>
                   <Input
@@ -158,7 +165,7 @@ export default function GlucoseTrackingPage() {
                     placeholder="Enter glucose value"
                     value={glucoseValue}
                     onChange={(e) => setGlucoseValue(e.target.value)}
-                    className="text-3xl font-bold text-center h-20 glass-card border-white/20 text-text-primary placeholder:text-text-muted"
+                    className="text-3xl font-bold text-center h-20 glass-input border-white/20 text-white placeholder:text-text-secondary"
                     required
                   />
                   {glucoseValue && (
@@ -173,11 +180,11 @@ export default function GlucoseTrackingPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <Label htmlFor="category" className="text-text-secondary font-medium">
+                  <Label htmlFor="category" className="text-white font-medium">
                     Reading Category
                   </Label>
                   <Select value={category} onValueChange={setCategory} required>
-                    <SelectTrigger className="glass-card border-white/20 text-text-primary">
+                    <SelectTrigger className="glass-input border-white/20 text-white">
                       <SelectValue placeholder="Select when you took this reading" />
                     </SelectTrigger>
                     <SelectContent className="glass-card border-white/20">
@@ -191,10 +198,13 @@ export default function GlucoseTrackingPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <Label className="text-text-secondary font-medium">Symptoms (if any)</Label>
+                  <Label className="text-white font-medium">Symptoms (if any)</Label>
                   <div className="grid grid-cols-2 gap-3">
                     {symptoms.map((symptom) => (
-                      <div key={symptom} className="flex items-center space-x-3 glass-card p-3 rounded-xl">
+                      <div
+                        key={symptom}
+                        className="flex items-center space-x-3 glass-card border-white/10 p-3 rounded-xl"
+                      >
                         <Checkbox
                           id={symptom}
                           checked={selectedSymptoms.includes(symptom)}
@@ -216,7 +226,7 @@ export default function GlucoseTrackingPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <Label htmlFor="notes" className="text-text-secondary font-medium">
+                  <Label htmlFor="notes" className="text-white font-medium">
                     Notes (optional)
                   </Label>
                   <Textarea
@@ -224,11 +234,11 @@ export default function GlucoseTrackingPage() {
                     placeholder="Any additional notes about this reading..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
-                    className="glass-card border-white/20 text-text-primary placeholder:text-text-muted"
+                    className="glass-input border-white/20 text-white placeholder:text-text-secondary"
                   />
                 </div>
 
-                <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                <Button type="submit" className="w-full gradient-primary" size="lg" disabled={isLoading}>
                   {isLoading ? "Saving..." : "Save Reading"}
                   <Icon3D shape="sphere" color="white" size="sm" className="ml-2" />
                 </Button>
@@ -237,9 +247,9 @@ export default function GlucoseTrackingPage() {
           </ElevatedCard>
 
           <div className="space-y-6">
-            <ElevatedCard className="animate-fade-in-up">
+            <ElevatedCard className="glass-card border-white/10 hover:border-white/20 transition-all duration-300 animate-fade-in-up">
               <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-text-primary">
+                <CardTitle className="flex items-center gap-3 text-white">
                   <Icon3D shape="cube" color="blue" size="md" />
                   Today's Glucose Trend
                 </CardTitle>
@@ -277,9 +287,9 @@ export default function GlucoseTrackingPage() {
               </CardContent>
             </ElevatedCard>
 
-            <ElevatedCard className="animate-fade-in-up">
+            <ElevatedCard className="glass-card border-white/10 hover:border-white/20 transition-all duration-300 animate-fade-in-up">
               <CardHeader>
-                <CardTitle className="flex items-center gap-3 text-text-primary">
+                <CardTitle className="flex items-center gap-3 text-white">
                   <Icon3D shape="torus" color="green" size="md" />
                   Recent Readings
                 </CardTitle>
@@ -292,17 +302,17 @@ export default function GlucoseTrackingPage() {
                   .map((reading, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between p-4 glass-card rounded-xl hover-lift transition-smooth"
+                      className="flex items-center justify-between p-4 glass-card border-white/10 rounded-xl hover-lift transition-smooth"
                     >
                       <div className="flex items-center gap-3">
                         <Icon3D shape="sphere" color="blue" size="sm" />
                         <div>
-                          <p className="font-semibold text-text-primary">{reading.time}</p>
+                          <p className="font-semibold text-white">{reading.time}</p>
                           <p className="text-sm text-text-secondary capitalize">{reading.category.replace("-", " ")}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-xl text-text-primary">{reading.value} mg/dL</p>
+                        <p className="font-bold text-xl text-white">{reading.value} mg/dL</p>
                         <Badge
                           className={`${getGlucoseStatus(reading.value).bg} ${getGlucoseStatus(reading.value).color} border-0 mt-1`}
                         >

@@ -15,6 +15,7 @@ import Image from "next/image"
 import { GamificationService } from "@/lib/gamification"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { toast } from "sonner"
+import { Icon3D } from "@/components/ui/3d-icon"
 
 interface FoodItem {
   name: string
@@ -208,41 +209,53 @@ export default function MealTrackingPage() {
   const totals = getTotalNutrition()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-full blur-lg animate-bounce"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl animate-bounce"></div>
+      </div>
+
+      <header className="glass-card border-b border-white/10 sticky top-0 z-50 relative">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <div className="flex items-center space-x-2">
-              <Utensils className="h-6 w-6 text-purple-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Meal Tracking</h1>
+            <div className="flex items-center space-x-3">
+              <Icon3D shape="sphere" color="purple" size="lg" icon={Utensils} />
+              <h1 className="text-2xl font-bold text-white">Meal Tracking</h1>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Meal Entry Form */}
-          <Card>
+          <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
-              <CardTitle>Log Meal</CardTitle>
-              <CardDescription>Record what you ate and track your nutrition</CardDescription>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Icon3D shape="cube" color="purple" size="sm" icon={Utensils} />
+                Log Meal
+              </CardTitle>
+              <CardDescription className="text-text-secondary">
+                Record what you ate and track your nutrition
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="mealType">Meal Type</Label>
+                  <Label htmlFor="mealType" className="text-white">
+                    Meal Type
+                  </Label>
                   <Select value={mealType} onValueChange={setMealType} required>
-                    <SelectTrigger>
+                    <SelectTrigger className="glass-input border-white/20 text-white">
                       <SelectValue placeholder="Select meal type" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="glass-card border-white/20">
                       <SelectItem value="breakfast">Breakfast</SelectItem>
                       <SelectItem value="lunch">Lunch</SelectItem>
                       <SelectItem value="dinner">Dinner</SelectItem>
@@ -251,9 +264,8 @@ export default function MealTrackingPage() {
                   </Select>
                 </div>
 
-                {/* Photo Option */}
                 <div className="space-y-2">
-                  <Label>Meal Photo</Label>
+                  <Label className="text-white">Meal Photo</Label>
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -267,14 +279,14 @@ export default function MealTrackingPage() {
                       type="button"
                       variant="outline"
                       onClick={handlePhotoCapture}
-                      className="w-full h-20 flex flex-col items-center justify-center space-y-2 bg-transparent"
+                      className="w-full h-20 flex flex-col items-center justify-center space-y-2 glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
                     >
                       <Camera className="h-6 w-6" />
                       <span>Take Photo for AI Recognition</span>
                     </Button>
                   ) : (
                     <div className="relative">
-                      <div className="w-full h-32 bg-gray-100 rounded-lg overflow-hidden">
+                      <div className="w-full h-32 glass-card border-white/10 rounded-lg overflow-hidden">
                         <Image
                           src={mealPhoto || "/placeholder.svg"}
                           alt="Meal photo"
@@ -288,7 +300,7 @@ export default function MealTrackingPage() {
                         variant="destructive"
                         size="sm"
                         onClick={removePhoto}
-                        className="absolute top-2 right-2"
+                        className="absolute top-2 right-2 bg-red-600 hover:bg-red-700"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -304,29 +316,30 @@ export default function MealTrackingPage() {
                   )}
                 </div>
 
-                {/* Food Search */}
                 <div className="space-y-2">
-                  <Label>Add Foods</Label>
+                  <Label className="text-white">Add Foods</Label>
                   <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-text-secondary" />
                     <Input
                       placeholder="Search for foods..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 glass-input border-white/20 text-white placeholder:text-text-secondary"
                     />
                   </div>
                   {searchTerm && (
-                    <div className="border rounded-lg max-h-40 overflow-y-auto">
+                    <div className="glass-card border-white/10 rounded-lg max-h-40 overflow-y-auto">
                       {filteredFoods.map((food, index) => (
                         <div
                           key={index}
-                          className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                          className="p-3 hover:bg-white/10 cursor-pointer border-b border-white/10 last:border-b-0 transition-colors"
                           onClick={() => addFood(food)}
                         >
                           <div className="flex justify-between items-center">
-                            <span className="font-medium">{food.name}</span>
-                            <Badge variant="secondary">{food.carbs}g carbs</Badge>
+                            <span className="font-medium text-white">{food.name}</span>
+                            <Badge className="bg-accent-blue/20 text-accent-blue border-accent-blue/30">
+                              {food.carbs}g carbs
+                            </Badge>
                           </div>
                         </div>
                       ))}
@@ -334,16 +347,18 @@ export default function MealTrackingPage() {
                   )}
                 </div>
 
-                {/* Selected Foods */}
                 {foods.length > 0 && (
                   <div className="space-y-2">
-                    <Label>Selected Foods</Label>
+                    <Label className="text-white">Selected Foods</Label>
                     <div className="space-y-2">
                       {foods.map((food, index) => (
-                        <div key={index} className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2 p-3 glass-card border-white/10 rounded-lg"
+                        >
                           <div className="flex-1">
-                            <p className="font-medium">{food.name}</p>
-                            <p className="text-sm text-gray-600">
+                            <p className="font-medium text-white">{food.name}</p>
+                            <p className="text-sm text-text-secondary">
                               {Math.round(food.carbs * food.quantity)}g carbs,{" "}
                               {Math.round(food.calories * food.quantity)} cal
                             </p>
@@ -354,9 +369,14 @@ export default function MealTrackingPage() {
                             step="0.1"
                             value={food.quantity}
                             onChange={(e) => updateFoodQuantity(index, Number(e.target.value))}
-                            className="w-20"
+                            className="w-20 glass-input border-white/20 text-white"
                           />
-                          <Button variant="ghost" size="sm" onClick={() => removeFood(index)}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFood(index)}
+                            className="text-white hover:bg-white/10"
+                          >
                             <X className="h-4 w-4" />
                           </Button>
                         </div>
@@ -366,72 +386,80 @@ export default function MealTrackingPage() {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="notes">Notes (optional)</Label>
+                  <Label htmlFor="notes" className="text-white">
+                    Notes (optional)
+                  </Label>
                   <Textarea
                     id="notes"
                     placeholder="How did you feel after eating? Any observations..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
+                    className="glass-input border-white/20 text-white placeholder:text-text-secondary"
                   />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading || foods.length === 0}>
+                <Button type="submit" className="w-full gradient-primary" disabled={isLoading || foods.length === 0}>
                   {isLoading ? "Saving..." : "Save Meal"}
                 </Button>
               </form>
             </CardContent>
           </Card>
 
-          {/* Nutrition Summary */}
           <div className="space-y-6">
-            <Card>
+            <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
-                <CardTitle>Nutrition Summary</CardTitle>
-                <CardDescription>Total nutrition for this meal</CardDescription>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Icon3D shape="torus" color="green" size="sm" icon={Utensils} />
+                  Nutrition Summary
+                </CardTitle>
+                <CardDescription className="text-text-secondary">Total nutrition for this meal</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{Math.round(totals.carbs)}g</div>
-                    <div className="text-sm text-gray-600">Carbohydrates</div>
+                  <div className="text-center p-4 glass-card border-accent-blue/30 bg-gradient-to-br from-accent-blue/10 to-accent-blue/5 rounded-lg">
+                    <div className="text-2xl font-bold text-accent-blue">{Math.round(totals.carbs)}g</div>
+                    <div className="text-sm text-text-secondary">Carbohydrates</div>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">{Math.round(totals.calories)}</div>
-                    <div className="text-sm text-gray-600">Calories</div>
+                  <div className="text-center p-4 glass-card border-accent-green/30 bg-gradient-to-br from-accent-green/10 to-accent-green/5 rounded-lg">
+                    <div className="text-2xl font-bold text-accent-green">{Math.round(totals.calories)}</div>
+                    <div className="text-sm text-text-secondary">Calories</div>
                   </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">{Math.round(totals.protein)}g</div>
-                    <div className="text-sm text-gray-600">Protein</div>
+                  <div className="text-center p-4 glass-card border-accent-purple/30 bg-gradient-to-br from-accent-purple/10 to-accent-purple/5 rounded-lg">
+                    <div className="text-2xl font-bold text-accent-purple">{Math.round(totals.protein)}g</div>
+                    <div className="text-sm text-text-secondary">Protein</div>
                   </div>
-                  <div className="text-center p-4 bg-orange-50 rounded-lg">
-                    <div className="text-2xl font-bold text-orange-600">{Math.round(totals.fat)}g</div>
-                    <div className="text-sm text-gray-600">Fat</div>
+                  <div className="text-center p-4 glass-card border-accent-orange/30 bg-gradient-to-br from-accent-orange/10 to-accent-orange/5 rounded-lg">
+                    <div className="text-2xl font-bold text-accent-orange">{Math.round(totals.fat)}g</div>
+                    <div className="text-sm text-text-secondary">Fat</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
-                <CardTitle>Today's Meals</CardTitle>
-                <CardDescription>What you've eaten so far today</CardDescription>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Icon3D shape="capsule" color="blue" size="sm" icon={Utensils} />
+                  Today's Meals
+                </CardTitle>
+                <CardDescription className="text-text-secondary">What you've eaten so far today</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-3 glass-card border-white/10 rounded-lg">
                   <div>
-                    <p className="font-medium">Breakfast</p>
-                    <p className="text-sm text-gray-600">Oatmeal with berries</p>
+                    <p className="font-medium text-white">Breakfast</p>
+                    <p className="text-sm text-text-secondary">Oatmeal with berries</p>
                   </div>
-                  <Badge variant="secondary">30g carbs</Badge>
+                  <Badge className="bg-accent-blue/20 text-accent-blue border-accent-blue/30">30g carbs</Badge>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center justify-between p-3 glass-card border-white/10 rounded-lg">
                   <div>
-                    <p className="font-medium">Lunch</p>
-                    <p className="text-sm text-gray-600">Grilled chicken salad</p>
+                    <p className="font-medium text-white">Lunch</p>
+                    <p className="text-sm text-text-secondary">Grilled chicken salad</p>
                   </div>
-                  <Badge variant="secondary">15g carbs</Badge>
+                  <Badge className="bg-accent-green/20 text-accent-green border-accent-green/30">15g carbs</Badge>
                 </div>
-                <div className="p-3 border-2 border-dashed border-gray-300 rounded-lg text-center text-gray-500">
+                <div className="p-3 border-2 border-dashed border-white/20 rounded-lg text-center text-text-secondary">
                   Add your next meal
                 </div>
               </CardContent>

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Icon3D } from "@/components/ui/3d-icon"
 
 export default function SupportGroupsPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -114,23 +115,32 @@ export default function SupportGroupsPage() {
   const otherGroups = filteredGroups.filter((group) => !group.isRecommended)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-full blur-lg animate-bounce"></div>
+        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl animate-bounce"></div>
+      </div>
+
+      <div className="glass-card border-b border-white/10 relative z-10">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link href="/community">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Support Groups</h1>
-                <p className="text-sm text-gray-600">Find your community and connect with peers</p>
+              <div className="flex items-center gap-3">
+                <Icon3D shape="sphere" color="blue" size="sm" icon={Users} />
+                <div>
+                  <h1 className="text-2xl font-bold text-white">Support Groups</h1>
+                  <p className="text-sm text-text-secondary">Find your community and connect with peers</p>
+                </div>
               </div>
             </div>
-            <Button>
+            <Button className="gradient-primary">
               <Users className="h-4 w-4 mr-2" />
               Create Group
             </Button>
@@ -138,24 +148,23 @@ export default function SupportGroupsPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Search and Filters */}
+      <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-text-secondary" />
             <Input
               placeholder="Search groups by name, description, or tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 glass-input border-white/20 text-white placeholder:text-text-secondary"
             />
           </div>
           <Select value={filterCategory} onValueChange={setFilterCategory}>
-            <SelectTrigger className="w-full md:w-48">
+            <SelectTrigger className="w-full md:w-48 glass-input border-white/20 text-white">
               <Filter className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Filter by category" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="glass-card border-white/20">
               <SelectItem value="all">All Categories</SelectItem>
               <SelectItem value="diabetes">Diabetes</SelectItem>
               <SelectItem value="weight-loss">Weight Loss</SelectItem>
@@ -165,60 +174,70 @@ export default function SupportGroupsPage() {
           </Select>
         </div>
 
-        {/* AI Recommended Groups */}
         {recommendedGroups.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-4">
-              <Bot className="h-5 w-5 text-purple-600" />
-              <h2 className="text-xl font-semibold text-gray-900">AI Recommended for You</h2>
-              <Badge variant="secondary">
+              <Icon3D shape="cube" color="purple" size="sm" icon={Bot} />
+              <h2 className="text-xl font-semibold text-white">AI Recommended for You</h2>
+              <Badge className="bg-accent-purple/20 text-accent-purple border-accent-purple/30">
                 <Sparkles className="h-3 w-3 mr-1" />
                 Smart Match
               </Badge>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {recommendedGroups.map((group) => (
-                <Card key={group.id} className="border-2 border-purple-200 bg-purple-50/30">
+                <Card
+                  key={group.id}
+                  className="glass-card border-accent-purple/30 bg-gradient-to-br from-accent-purple/10 to-accent-purple/5 hover:border-accent-purple/50 transition-all duration-300"
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-lg">{group.name}</CardTitle>
-                        <CardDescription className="mt-1">{group.description}</CardDescription>
+                        <CardTitle className="text-lg text-white">{group.name}</CardTitle>
+                        <CardDescription className="mt-1 text-text-secondary">{group.description}</CardDescription>
                       </div>
                       <div className="flex items-center gap-1 text-sm">
                         <Star className="h-4 w-4 text-yellow-500" />
-                        <span className="font-medium">{group.aiMatch}%</span>
+                        <span className="font-medium text-white">{group.aiMatch}%</span>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {group.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge key={index} className="text-xs bg-accent-blue/20 text-accent-blue border-accent-blue/30">
                           {tag}
                         </Badge>
                       ))}
                     </div>
 
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-4 text-sm text-text-secondary">
                         <div className="flex items-center gap-1">
                           <Users className="h-4 w-4" />
                           {group.members} members
                         </div>
-                        <Badge variant={group.activity === "Very Active" ? "default" : "secondary"} className="text-xs">
+                        <Badge
+                          className={
+                            group.activity === "Very Active"
+                              ? "bg-accent-green/20 text-accent-green border-accent-green/30"
+                              : "bg-accent-blue/20 text-accent-blue border-accent-blue/30"
+                          }
+                        >
                           {group.activity}
                         </Badge>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-text-secondary">
                         <p>Moderated by {group.moderator}</p>
                         <p>Last activity: {group.lastActivity}</p>
                       </div>
                       <Link href={`/community/groups/${group.id}`}>
-                        <Button size="sm">Join Group</Button>
+                        <Button size="sm" className="gradient-primary">
+                          Join Group
+                        </Button>
                       </Link>
                     </div>
                   </CardContent>
@@ -228,20 +247,22 @@ export default function SupportGroupsPage() {
           </div>
         )}
 
-        {/* Other Groups */}
         {otherGroups.length > 0 && (
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">All Support Groups</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">All Support Groups</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {otherGroups.map((group) => (
-                <Card key={group.id}>
+                <Card
+                  key={group.id}
+                  className="glass-card border-white/10 hover:border-white/20 transition-all duration-300"
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-lg">{group.name}</CardTitle>
-                        <CardDescription className="mt-1">{group.description}</CardDescription>
+                        <CardTitle className="text-lg text-white">{group.name}</CardTitle>
+                        <CardDescription className="mt-1 text-text-secondary">{group.description}</CardDescription>
                       </div>
-                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <div className="flex items-center gap-1 text-sm text-text-secondary">
                         <Star className="h-4 w-4" />
                         <span>{group.aiMatch}%</span>
                       </div>
@@ -250,31 +271,41 @@ export default function SupportGroupsPage() {
                   <CardContent>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {group.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge key={index} className="text-xs bg-accent-blue/20 text-accent-blue border-accent-blue/30">
                           {tag}
                         </Badge>
                       ))}
                     </div>
 
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-4 text-sm text-text-secondary">
                         <div className="flex items-center gap-1">
                           <Users className="h-4 w-4" />
                           {group.members} members
                         </div>
-                        <Badge variant={group.activity === "Very Active" ? "default" : "secondary"} className="text-xs">
+                        <Badge
+                          className={
+                            group.activity === "Very Active"
+                              ? "bg-accent-green/20 text-accent-green border-accent-green/30"
+                              : "bg-accent-blue/20 text-accent-blue border-accent-blue/30"
+                          }
+                        >
                           {group.activity}
                         </Badge>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-text-secondary">
                         <p>Moderated by {group.moderator}</p>
                         <p>Last activity: {group.lastActivity}</p>
                       </div>
                       <Link href={`/community/groups/${group.id}`}>
-                        <Button variant="outline" size="sm">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
+                        >
                           Join Group
                         </Button>
                       </Link>
@@ -288,10 +319,10 @@ export default function SupportGroupsPage() {
 
         {filteredGroups.length === 0 && (
           <div className="text-center py-12">
-            <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No groups found</h3>
-            <p className="text-gray-600 mb-4">Try adjusting your search or filters, or create a new group.</p>
-            <Button>Create New Group</Button>
+            <Icon3D shape="sphere" color="blue" size="lg" icon={Users} />
+            <h3 className="text-lg font-medium text-white mb-2 mt-4">No groups found</h3>
+            <p className="text-text-secondary mb-4">Try adjusting your search or filters, or create a new group.</p>
+            <Button className="gradient-primary">Create New Group</Button>
           </div>
         )}
       </div>
