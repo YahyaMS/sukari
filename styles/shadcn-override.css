@@ -1,0 +1,23 @@
+:root {
+  --background: rgb(var(--bg-primary));
+  --foreground: rgb(var(--text-primary));
+  --card: rgba(255, 255, 255, 0.08);
+  --card-foreground: rgb(var(--text-secondary));
+  --popover: rgba(255, 255, 255, 0.08);
+  --popover-foreground: rgb(var(--text-secondary));
+  --primary: rgb(var(--accent-purple));
+  --primary-foreground: #fff;
+  --secondary: rgba(255, 255, 255, 0.1);
+  --secondary-foreground: #fff;
+  --muted: rgba(255, 255, 255, 0.06);
+  --muted-foreground: rgb(var(--text-muted));
+  --accent: rgb(var(--accent-blue));
+  --accent-foreground: #fff;
+  --destructive: #ef4444;
+  --destructive-foreground: #fff;
+  --border: rgba(255, 255, 255, 0.12);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: rgba(139, 92, 246, 0.6);
+
+  --radius: 12px; /* shadcn global radius */
+}
