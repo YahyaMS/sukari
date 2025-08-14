@@ -1,83 +1,151 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Progress } from "@/components/ui/progress"
 import { Icon3D } from "@/components/ui/3d-icon"
-import {
-  LineChart,
-  Line,
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts"
-import { TrendingUp, TrendingDown, ArrowLeft, Download, Share, Calendar } from "lucide-react"
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { ArrowLeft, Download } from "lucide-react"
 import Link from "next/link"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
-// Mock data for charts
-const glucoseData = [
-  { date: "Jan 1", fasting: 95, postMeal: 140, target: 120 },
-  { date: "Jan 2", fasting: 92, postMeal: 135, target: 120 },
-  { date: "Jan 3", fasting: 98, postMeal: 145, target: 120 },
-  { date: "Jan 4", fasting: 90, postMeal: 130, target: 120 },
-  { date: "Jan 5", fasting: 88, postMeal: 125, target: 120 },
-  { date: "Jan 6", fasting: 85, postMeal: 120, target: 120 },
-  { date: "Jan 7", fasting: 87, postMeal: 118, target: 120 },
-]
-
-const weightData = [
-  { week: "Week 1", weight: 185, goal: 165 },
-  { week: "Week 2", weight: 183.5, goal: 165 },
-  { week: "Week 3", weight: 181.8, goal: 165 },
-  { week: "Week 4", weight: 180.2, goal: 165 },
-  { week: "Week 5", weight: 178.9, goal: 165 },
-  { week: "Week 6", weight: 177.5, goal: 165 },
-]
-
-const hba1cData = [
-  { month: "Oct", actual: 8.2, predicted: 8.1 },
-  { month: "Nov", actual: 7.8, predicted: 7.7 },
-  { month: "Dec", actual: 7.4, predicted: 7.3 },
-  { month: "Jan", actual: null, predicted: 6.9 },
-  { month: "Feb", actual: null, predicted: 6.5 },
-  { month: "Mar", actual: null, predicted: 6.2 },
-]
-
-const foodResponseData = [
-  { food: "Oatmeal", avgResponse: 25, frequency: 12 },
-  { food: "White Rice", avgResponse: 45, frequency: 8 },
-  { food: "Brown Rice", avgResponse: 35, frequency: 10 },
-  { food: "Chicken", avgResponse: 5, frequency: 15 },
-  { food: "Vegetables", avgResponse: 10, frequency: 20 },
-]
-
-const exerciseImpactData = [
-  { type: "Walking", beforeExercise: 145, afterExercise: 125, sessions: 15 },
-  { type: "Weight Training", beforeExercise: 140, afterExercise: 130, sessions: 8 },
-  { type: "Cycling", beforeExercise: 150, afterExercise: 120, sessions: 6 },
-  { type: "Yoga", beforeExercise: 135, afterExercise: 128, sessions: 10 },
-]
-
-const goalProgress = [
-  { goal: "Lower HbA1c to 6.5%", current: 7.4, target: 6.5, progress: 65 },
-  { goal: "Lose 20 lbs", current: 7.5, target: 20, progress: 38 },
-  { goal: "Exercise 150 min/week", current: 135, target: 150, progress: 90 },
-  { goal: "Glucose in range 70%", current: 68, target: 70, progress: 97 },
-]
+interface AnalyticsData {
+  glucoseReadings: any[]
+  weightEntries: any[]
+  meals: any[]
+  exerciseLogs: any[]
+  avgGlucose: number
+  weightChange: number
+  timeInRange: number
+  totalReadings: number
+}
 
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState("30d")
-  const [selectedMetric, setSelectedMetric] = useState("glucose")
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    fetchAnalyticsData()
+  }, [timeRange])
+
+  const fetchAnalyticsData = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) return
+
+      // Calculate date range
+      const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : timeRange === "90d" ? 90 : 365
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - days)
+
+      // Fetch glucose readings
+      const { data: glucoseReadings } = await supabase
+        .from("glucose_readings")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("timestamp", startDate.toISOString())
+        .order("timestamp", { ascending: true })
+
+      // Fetch weight entries
+      const { data: weightEntries } = await supabase
+        .from("weight_entries")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("timestamp", startDate.toISOString())
+        .order("timestamp", { ascending: true })
+
+      // Fetch meals
+      const { data: meals } = await supabase
+        .from("meals")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("timestamp", startDate.toISOString())
+        .order("timestamp", { ascending: true })
+
+      // Fetch exercise logs (if table exists)
+      const { data: exerciseLogs } = await supabase
+        .from("exercise_logs")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("timestamp", startDate.toISOString())
+        .order("timestamp", { ascending: true })
+        .then((result) => result)
+        .catch(() => ({ data: [] })) // Handle if table doesn't exist
+
+      // Calculate analytics
+      const avgGlucose = glucoseReadings?.length
+        ? glucoseReadings.reduce((sum, reading) => sum + reading.value, 0) / glucoseReadings.length
+        : 0
+
+      const weightChange =
+        weightEntries?.length >= 2 ? weightEntries[weightEntries.length - 1].weight_kg - weightEntries[0].weight_kg : 0
+
+      const timeInRange = glucoseReadings?.length
+        ? (glucoseReadings.filter((r) => r.value >= 70 && r.value <= 180).length / glucoseReadings.length) * 100
+        : 0
+
+      setAnalyticsData({
+        glucoseReadings: glucoseReadings || [],
+        weightEntries: weightEntries || [],
+        meals: meals || [],
+        exerciseLogs: exerciseLogs || [],
+        avgGlucose: Math.round(avgGlucose),
+        weightChange: Math.round(weightChange * 2.20462 * 10) / 10, // Convert to lbs
+        timeInRange: Math.round(timeInRange),
+        totalReadings: glucoseReadings?.length || 0,
+      })
+    } catch (error) {
+      console.error("Error fetching analytics data:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const prepareGlucoseChartData = () => {
+    if (!analyticsData?.glucoseReadings.length) return []
+
+    return analyticsData.glucoseReadings.slice(-14).map((reading) => ({
+      date: new Date(reading.timestamp).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      value: reading.value,
+      category: reading.category,
+    }))
+  }
+
+  const prepareWeightChartData = () => {
+    if (!analyticsData?.weightEntries.length) return []
+
+    return analyticsData.weightEntries.map((entry, index) => ({
+      week: `Week ${index + 1}`,
+      weight: Math.round(entry.weight_kg * 2.20462 * 10) / 10, // Convert to lbs
+      date: new Date(entry.timestamp).toLocaleDateString(),
+    }))
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] flex items-center justify-center">
+        <div className="text-center">
+          <Icon3D shape="sphere" color="blue" size="xl" className="mx-auto mb-4 animate-pulse" />
+          <p className="text-white text-lg">Loading your health analytics...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const hasData =
+    analyticsData &&
+    (analyticsData.glucoseReadings.length > 0 ||
+      analyticsData.weightEntries.length > 0 ||
+      analyticsData.meals.length > 0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
@@ -106,604 +174,348 @@ export default function AnalyticsPage() {
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Select value={timeRange} onValueChange={setTimeRange}>
-                <SelectTrigger className="w-32 glass-input border-white/20 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="glass-card border-white/20">
-                  <SelectItem value="7d">Last 7 days</SelectItem>
-                  <SelectItem value="30d">Last 30 days</SelectItem>
-                  <SelectItem value="90d">Last 3 months</SelectItem>
-                  <SelectItem value="1y">Last year</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button
-                variant="outline"
-                size="sm"
-                className="glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
-              >
-                <Share className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-            </div>
+            {hasData && (
+              <div className="flex items-center space-x-4">
+                <Select value={timeRange} onValueChange={setTimeRange}>
+                  <SelectTrigger className="w-32 glass-input border-white/20 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="glass-card border-white/20">
+                    <SelectItem value="7d">Last 7 days</SelectItem>
+                    <SelectItem value="30d">Last 30 days</SelectItem>
+                    <SelectItem value="90d">Last 3 months</SelectItem>
+                    <SelectItem value="1y">Last year</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-6 py-8 relative z-10">
-        {/* Key Metrics Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade-in-up">
-          <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Avg Glucose</CardTitle>
-              <Icon3D shape="sphere" color="blue" size="sm" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">128 mg/dL</div>
-              <div className="flex items-center text-sm text-accent-green">
-                <TrendingDown className="h-4 w-4 mr-1" />
-                -12% from last month
+        {!hasData ? (
+          <div className="glass-card p-12 text-center animate-fade-in-up">
+            <Icon3D shape="cube" color="blue" size="xl" className="mx-auto mb-6" />
+            <h2 className="text-2xl font-bold text-white mb-4">Your Analytics Are Building</h2>
+            <p className="text-text-secondary text-lg mb-8 max-w-2xl mx-auto">
+              Start tracking your health data to unlock powerful insights and trends. Your analytics will become more
+              meaningful as you log glucose readings, meals, weight, and exercise.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mb-8">
+              <div className="glass-card p-6 border-white/10">
+                <Icon3D shape="sphere" color="blue" size="lg" className="mx-auto mb-4" />
+                <h3 className="text-white font-semibold mb-2">Glucose Trends</h3>
+                <p className="text-text-secondary text-sm">
+                  Track patterns and see how food, exercise, and medication affect your levels
+                </p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Weight Loss</CardTitle>
-              <Icon3D shape="cube" color="green" size="sm" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">7.5 lbs</div>
-              <div className="flex items-center text-sm text-accent-green">
-                <TrendingDown className="h-4 w-4 mr-1" />
-                38% to goal
+              <div className="glass-card p-6 border-white/10">
+                <Icon3D shape="scale" color="green" size="lg" className="mx-auto mb-4" />
+                <h3 className="text-white font-semibold mb-2">Progress Tracking</h3>
+                <p className="text-text-secondary text-sm">
+                  Monitor weight changes and see your journey toward health goals
+                </p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">Time in Range</CardTitle>
-              <Icon3D shape="torus" color="purple" size="sm" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">68%</div>
-              <div className="flex items-center text-sm text-accent-orange">
-                <TrendingUp className="h-4 w-4 mr-1" />
-                +15% from last month
+              <div className="glass-card p-6 border-white/10">
+                <Icon3D shape="utensils" color="purple" size="lg" className="mx-auto mb-4" />
+                <h3 className="text-white font-semibold mb-2">Food Insights</h3>
+                <p className="text-text-secondary text-sm">Discover which foods work best for your glucose control</p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-white">HbA1c Trend</CardTitle>
-              <Icon3D shape="capsule" color="orange" size="sm" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">7.4%</div>
-              <div className="flex items-center text-sm text-accent-green">
-                <TrendingDown className="h-4 w-4 mr-1" />
-                Predicted: 6.9%
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Tabs defaultValue="trends" className="space-y-6">
-          <TabsList className="glass-card border-white/10 grid w-full grid-cols-4 p-2 h-14">
-            <TabsTrigger
-              value="trends"
-              className="flex items-center gap-2 text-text-secondary data-[state=active]:text-white data-[state=active]:bg-white/10 rounded-xl transition-all"
-            >
-              <Icon3D shape="sphere" color="blue" size="sm" />
-              Health Trends
-            </TabsTrigger>
-            <TabsTrigger
-              value="patterns"
-              className="flex items-center gap-2 text-text-secondary data-[state=active]:text-white data-[state=active]:bg-white/10 rounded-xl transition-all"
-            >
-              <Icon3D shape="cube" color="green" size="sm" />
-              Patterns & Insights
-            </TabsTrigger>
-            <TabsTrigger
-              value="goals"
-              className="flex items-center gap-2 text-text-secondary data-[state=active]:text-white data-[state=active]:bg-white/10 rounded-xl transition-all"
-            >
-              <Icon3D shape="torus" color="purple" size="sm" />
-              Goal Progress
-            </TabsTrigger>
-            <TabsTrigger
-              value="reports"
-              className="flex items-center gap-2 text-text-secondary data-[state=active]:text-white data-[state=active]:bg-white/10 rounded-xl transition-all"
-            >
-              <Icon3D shape="capsule" color="orange" size="sm" />
-              Reports
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Health Trends Tab */}
-          <TabsContent value="trends" className="space-y-6 animate-fade-in-up">
-            <div className="grid lg:grid-cols-2 gap-6">
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/tracking/glucose">
+                <Button size="lg" className="gradient-primary">
+                  <Icon3D shape="sphere" color="white" size="sm" className="mr-2" />
+                  Log First Glucose Reading
+                </Button>
+              </Link>
+              <Link href="/tracking/meals">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
+                >
+                  <Icon3D shape="utensils" color="white" size="sm" className="mr-2" />
+                  Track Your First Meal
+                </Button>
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Key Metrics Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-fade-in-up">
               <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Glucose Trends</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Fasting and post-meal glucose levels over time
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">Avg Glucose</CardTitle>
+                  <Icon3D shape="sphere" color="blue" size="sm" />
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={glucoseData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="date" stroke="#9CA3AF" />
-                        <YAxis domain={[60, 180]} stroke="#9CA3AF" />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "rgba(17, 24, 39, 0.8)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                            borderRadius: "8px",
-                            color: "#fff",
-                          }}
-                        />
-                        <Line type="monotone" dataKey="fasting" stroke="#3B82F6" strokeWidth={2} name="Fasting" />
-                        <Line type="monotone" dataKey="postMeal" stroke="#EF4444" strokeWidth={2} name="Post-meal" />
-                        <Line
-                          type="monotone"
-                          dataKey="target"
-                          stroke="#10B981"
-                          strokeWidth={1}
-                          strokeDasharray="5 5"
-                          name="Target"
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                  <div className="text-2xl font-bold text-white">
+                    {analyticsData.avgGlucose > 0 ? `${analyticsData.avgGlucose} mg/dL` : "No data"}
+                  </div>
+                  <div className="flex items-center text-sm text-text-secondary">
+                    <span>{analyticsData.totalReadings} readings</span>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Weight Progress</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Weekly weight measurements and goal tracking
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">Weight Change</CardTitle>
+                  <Icon3D shape="cube" color="green" size="sm" />
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={weightData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="week" stroke="#9CA3AF" />
-                        <YAxis domain={[160, 190]} stroke="#9CA3AF" />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "rgba(17, 24, 39, 0.8)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                            borderRadius: "8px",
-                            color: "#fff",
-                          }}
-                        />
-                        <Area
-                          type="monotone"
-                          dataKey="weight"
-                          stroke="#10B981"
-                          fill="#10B981"
-                          fillOpacity={0.3}
-                          name="Current Weight"
-                        />
-                        <Line type="monotone" dataKey="goal" stroke="#EF4444" strokeDasharray="5 5" name="Goal" />
-                      </AreaChart>
-                    </ResponsiveContainer>
+                  <div className="text-2xl font-bold text-white">
+                    {analyticsData.weightChange !== 0
+                      ? `${analyticsData.weightChange > 0 ? "+" : ""}${analyticsData.weightChange} lbs`
+                      : "No change"}
+                  </div>
+                  <div className="flex items-center text-sm text-text-secondary">
+                    <span>{analyticsData.weightEntries.length} measurements</span>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">HbA1c Prediction</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Historical values and AI-powered predictions
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">Time in Range</CardTitle>
+                  <Icon3D shape="torus" color="purple" size="sm" />
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={hba1cData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="month" stroke="#9CA3AF" />
-                        <YAxis domain={[6, 9]} stroke="#9CA3AF" />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "rgba(17, 24, 39, 0.8)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                            borderRadius: "8px",
-                            color: "#fff",
-                          }}
-                        />
-                        <Line type="monotone" dataKey="actual" stroke="#3B82F6" strokeWidth={2} name="Actual" />
-                        <Line
-                          type="monotone"
-                          dataKey="predicted"
-                          stroke="#F59E0B"
-                          strokeWidth={2}
-                          strokeDasharray="5 5"
-                          name="Predicted"
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                  <div className="text-2xl font-bold text-white">
+                    {analyticsData.timeInRange > 0 ? `${analyticsData.timeInRange}%` : "No data"}
+                  </div>
+                  <div className="flex items-center text-sm text-text-secondary">
+                    <span>70-180 mg/dL range</span>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Exercise Impact</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Glucose levels before and after different exercises
-                  </CardDescription>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-white">Meals Logged</CardTitle>
+                  <Icon3D shape="capsule" color="orange" size="sm" />
                 </CardHeader>
                 <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={exerciseImpactData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="type" stroke="#9CA3AF" />
-                        <YAxis stroke="#9CA3AF" />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "rgba(17, 24, 39, 0.8)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                            borderRadius: "8px",
-                            color: "#fff",
-                          }}
-                        />
-                        <Bar dataKey="beforeExercise" fill="#EF4444" name="Before Exercise" />
-                        <Bar dataKey="afterExercise" fill="#22C55E" name="After Exercise" />
-                      </BarChart>
-                    </ResponsiveContainer>
+                  <div className="text-2xl font-bold text-white">{analyticsData.meals.length}</div>
+                  <div className="flex items-center text-sm text-text-secondary">
+                    <span>In selected period</span>
                   </div>
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
 
-          {/* Patterns & Insights Tab */}
-          <TabsContent value="patterns" className="space-y-6 animate-fade-in-up">
-            <div className="grid lg:grid-cols-2 gap-6">
-              <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Food Response Patterns</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    How different foods affect your glucose levels
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {foodResponseData.map((food, index) => (
-                      <div
-                        key={food.food}
-                        className="flex items-center justify-between p-3 glass-card border-white/10 rounded-lg"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div
-                            className={`w-3 h-3 rounded-full ${
-                              food.avgResponse > 40
-                                ? "bg-red-500"
-                                : food.avgResponse > 25
-                                  ? "bg-orange-500"
-                                  : "bg-green-500"
-                            }`}
-                          />
-                          <div>
-                            <p className="font-medium text-white">{food.food}</p>
-                            <p className="text-sm text-gray-300">{food.frequency} meals logged</p>
+            <Tabs defaultValue="trends" className="space-y-6">
+              <TabsList className="glass-card border-white/10 grid w-full grid-cols-2 p-2 h-14">
+                <TabsTrigger
+                  value="trends"
+                  className="flex items-center gap-2 text-text-secondary data-[state=active]:text-white data-[state=active]:bg-white/10 rounded-xl transition-all"
+                >
+                  <Icon3D shape="sphere" color="blue" size="sm" />
+                  Health Trends
+                </TabsTrigger>
+                <TabsTrigger
+                  value="summary"
+                  className="flex items-center gap-2 text-text-secondary data-[state=active]:text-white data-[state=active]:bg-white/10 rounded-xl transition-all"
+                >
+                  <Icon3D shape="cube" color="green" size="sm" />
+                  Summary Report
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Health Trends Tab */}
+              <TabsContent value="trends" className="space-y-6 animate-fade-in-up">
+                <div className="grid lg:grid-cols-2 gap-6">
+                  <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
+                    <CardHeader>
+                      <CardTitle className="text-white">Glucose Trends</CardTitle>
+                      <CardDescription className="text-gray-300">Your glucose readings over time</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {prepareGlucoseChartData().length > 0 ? (
+                        <div className="h-80">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={prepareGlucoseChartData()}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                              <XAxis dataKey="date" stroke="#9CA3AF" />
+                              <YAxis domain={[60, 200]} stroke="#9CA3AF" />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: "rgba(17, 24, 39, 0.8)",
+                                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                                  borderRadius: "8px",
+                                  color: "#fff",
+                                }}
+                              />
+                              <Line type="monotone" dataKey="value" stroke="#3B82F6" strokeWidth={2} name="Glucose" />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      ) : (
+                        <div className="h-80 flex items-center justify-center">
+                          <div className="text-center">
+                            <Icon3D shape="sphere" color="blue" size="lg" className="mx-auto mb-4" />
+                            <h3 className="text-white font-medium mb-2">No glucose data yet</h3>
+                            <p className="text-text-secondary text-sm mb-4">
+                              Start logging glucose readings to see your trends
+                            </p>
+                            <Link href="/tracking/glucose">
+                              <Button size="sm" className="gradient-primary">
+                                Log Reading
+                              </Button>
+                            </Link>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-bold text-white">+{food.avgResponse} mg/dL</p>
-                          <p className="text-xs text-gray-400">avg response</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      )}
+                    </CardContent>
+                  </Card>
 
-              <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Weekly Patterns</CardTitle>
-                  <CardDescription className="text-gray-300">Your glucose patterns by day of the week</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={[
-                          { day: "Mon", avg: 125, readings: 8 },
-                          { day: "Tue", avg: 130, readings: 7 },
-                          { day: "Wed", avg: 128, readings: 9 },
-                          { day: "Thu", avg: 135, readings: 6 },
-                          { day: "Fri", avg: 140, readings: 5 },
-                          { day: "Sat", avg: 145, readings: 4 },
-                          { day: "Sun", avg: 132, readings: 6 },
-                        ]}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                        <XAxis dataKey="day" stroke="#9CA3AF" />
-                        <YAxis stroke="#9CA3AF" />
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "rgba(17, 24, 39, 0.8)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                            borderRadius: "8px",
-                            color: "#fff",
-                          }}
-                        />
-                        <Bar dataKey="avg" fill="#3B82F6" name="Average Glucose" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </CardContent>
-              </Card>
+                  <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
+                    <CardHeader>
+                      <CardTitle className="text-white">Weight Progress</CardTitle>
+                      <CardDescription className="text-gray-300">Your weight measurements over time</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      {prepareWeightChartData().length > 0 ? (
+                        <div className="h-80">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={prepareWeightChartData()}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                              <XAxis dataKey="week" stroke="#9CA3AF" />
+                              <YAxis stroke="#9CA3AF" />
+                              <Tooltip
+                                contentStyle={{
+                                  backgroundColor: "rgba(17, 24, 39, 0.8)",
+                                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                                  borderRadius: "8px",
+                                  color: "#fff",
+                                }}
+                              />
+                              <Area
+                                type="monotone"
+                                dataKey="weight"
+                                stroke="#10B981"
+                                fill="#10B981"
+                                fillOpacity={0.3}
+                                name="Weight (lbs)"
+                              />
+                            </AreaChart>
+                          </ResponsiveContainer>
+                        </div>
+                      ) : (
+                        <div className="h-80 flex items-center justify-center">
+                          <div className="text-center">
+                            <Icon3D shape="scale" color="green" size="lg" className="mx-auto mb-4" />
+                            <h3 className="text-white font-medium mb-2">No weight data yet</h3>
+                            <p className="text-text-secondary text-sm mb-4">
+                              Start tracking weight to see your progress
+                            </p>
+                            <Link href="/tracking/weight">
+                              <Button size="sm" className="gradient-primary">
+                                Log Weight
+                              </Button>
+                            </Link>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
 
-              <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Key Insights</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    AI-generated insights from your health data
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-start space-x-3 p-3 glass-card border-accent-blue/30 bg-gradient-to-br from-accent-blue/10 to-accent-blue/5 rounded-lg">
-                    <Icon3D shape="sphere" color="blue" size="sm" className="mt-0.5" />
-                    <div>
-                      <p className="font-medium text-accent-blue">Exercise Timing</p>
-                      <p className="text-sm text-gray-300">
-                        Walking after dinner reduces your glucose by an average of 20 mg/dL
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 p-3 glass-card border-accent-green/30 bg-gradient-to-br from-accent-green/10 to-accent-green/5 rounded-lg">
-                    <Icon3D shape="cube" color="green" size="sm" className="mt-0.5" />
-                    <div>
-                      <p className="font-medium text-accent-green">Best Meal Timing</p>
-                      <p className="text-sm text-gray-300">
-                        Your glucose control is best when you eat lunch between 12-1 PM
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start space-x-3 p-3 glass-card border-accent-orange/30 bg-gradient-to-br from-accent-orange/10 to-accent-orange/5 rounded-lg">
-                    <Icon3D shape="torus" color="orange" size="sm" className="mt-0.5" />
-                    <div>
-                      <p className="font-medium text-accent-orange">Sleep Impact</p>
-                      <p className="text-sm text-gray-300">
-                        Poor sleep ({"<"}6 hours) correlates with 15% higher morning glucose
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Medication Effectiveness</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    How your medications are impacting your glucose control
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 glass-card border-white/10 rounded-lg">
-                      <div>
-                        <p className="font-medium text-white">Metformin 500mg</p>
-                        <p className="text-sm text-gray-300">Twice daily</p>
-                      </div>
-                      <div className="text-right">
-                        <Badge className="bg-accent-green/20 text-accent-green border-accent-green/30">Effective</Badge>
-                        <p className="text-xs text-gray-400 mt-1">-18% avg glucose</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 glass-card border-white/10 rounded-lg">
-                      <div>
-                        <p className="font-medium text-white">Glipizide 5mg</p>
-                        <p className="text-sm text-gray-300">Once daily</p>
-                      </div>
-                      <div className="text-right">
-                        <Badge className="bg-accent-orange/20 text-accent-orange border-accent-orange/30">
-                          Moderate
-                        </Badge>
-                        <p className="text-xs text-gray-400 mt-1">-8% avg glucose</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Goal Progress Tab */}
-          <TabsContent value="goals" className="space-y-6 animate-fade-in-up">
-            <div className="grid lg:grid-cols-2 gap-6">
-              <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Goal Achievement</CardTitle>
-                  <CardDescription className="text-gray-300">Track your progress toward health goals</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {goalProgress.map((goal, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <p className="font-medium text-sm text-white">{goal.goal}</p>
-                        <Badge
-                          className={
-                            goal.progress >= 90
-                              ? "bg-accent-green/20 text-accent-green border-accent-green/30"
-                              : goal.progress >= 70
-                                ? "bg-accent-orange/20 text-accent-orange border-accent-orange/30"
-                                : "bg-red-500/20 text-red-400 border-red-500/30"
-                          }
-                        >
-                          {goal.progress}%
-                        </Badge>
-                      </div>
-                      <Progress value={goal.progress} className="h-2" />
-                      <div className="flex justify-between text-xs text-gray-400">
-                        <span>Current: {goal.current}</span>
-                        <span>Target: {goal.target}</span>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Monthly Achievements</CardTitle>
-                  <CardDescription className="text-gray-300">Your accomplishments this month</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3 p-3 glass-card border-accent-green/30 bg-gradient-to-br from-accent-green/10 to-accent-green/5 rounded-lg">
-                    <div className="w-8 h-8 bg-accent-green rounded-full flex items-center justify-center">
-                      <Icon3D shape="torus" color="green" size="xs" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">Glucose Target Days</p>
-                      <p className="text-sm text-gray-300">21 out of 30 days in target range</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 glass-card border-accent-blue/30 bg-gradient-to-br from-accent-blue/10 to-accent-blue/5 rounded-lg">
-                    <div className="w-8 h-8 bg-accent-blue rounded-full flex items-center justify-center">
-                      <Icon3D shape="sphere" color="blue" size="xs" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">Exercise Streak</p>
-                      <p className="text-sm text-gray-300">12 consecutive days with activity</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 p-3 glass-card border-accent-purple/30 bg-gradient-to-br from-accent-purple/10 to-accent-purple/5 rounded-lg">
-                    <div className="w-8 h-8 bg-accent-purple rounded-full flex items-center justify-center">
-                      <Icon3D shape="cube" color="purple" size="xs" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">Weight Loss Milestone</p>
-                      <p className="text-sm text-gray-300">Lost 7.5 lbs - halfway to goal!</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* Reports Tab */}
-          <TabsContent value="reports" className="space-y-6 animate-fade-in-up">
-            <div className="grid lg:grid-cols-3 gap-6">
-              <Card className="lg:col-span-2 glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Monthly Health Report</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Comprehensive summary for healthcare providers
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-white">Key Metrics Summary</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Average Fasting Glucose:</span>
-                          <span className="font-medium text-white">89 mg/dL</span>
+              {/* Summary Report Tab */}
+              <TabsContent value="summary" className="space-y-6 animate-fade-in-up">
+                <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
+                  <CardHeader>
+                    <CardTitle className="text-white">Health Summary Report</CardTitle>
+                    <CardDescription className="text-gray-300">
+                      Overview of your health data for the selected period
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-white">Key Metrics</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-300">Total Glucose Readings:</span>
+                            <span className="font-medium text-white">{analyticsData.totalReadings}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-300">Average Glucose:</span>
+                            <span className="font-medium text-white">
+                              {analyticsData.avgGlucose > 0 ? `${analyticsData.avgGlucose} mg/dL` : "No data"}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-300">Time in Range:</span>
+                            <span className="font-medium text-white">
+                              {analyticsData.timeInRange > 0 ? `${analyticsData.timeInRange}%` : "No data"}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-300">Weight Change:</span>
+                            <span
+                              className={`font-medium ${
+                                analyticsData.weightChange < 0 ? "text-accent-green" : "text-white"
+                              }`}
+                            >
+                              {analyticsData.weightChange !== 0
+                                ? `${analyticsData.weightChange > 0 ? "+" : ""}${analyticsData.weightChange} lbs`
+                                : "No change"}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-300">Meals Logged:</span>
+                            <span className="font-medium text-white">{analyticsData.meals.length}</span>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Average Post-meal Glucose:</span>
-                          <span className="font-medium text-white">128 mg/dL</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Time in Range (70-180):</span>
-                          <span className="font-medium text-white">68%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Weight Change:</span>
-                          <span className="font-medium text-accent-green">-7.5 lbs</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Exercise Sessions:</span>
-                          <span className="font-medium text-white">24</span>
+                      </div>
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-white">Data Collection Progress</h4>
+                        <div className="space-y-3">
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-gray-300">Glucose Tracking</span>
+                              <span className="text-white">{analyticsData.totalReadings > 0 ? "Active" : "Start"}</span>
+                            </div>
+                            <Progress value={analyticsData.totalReadings > 0 ? 100 : 0} className="h-2" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-gray-300">Weight Tracking</span>
+                              <span className="text-white">
+                                {analyticsData.weightEntries.length > 0 ? "Active" : "Start"}
+                              </span>
+                            </div>
+                            <Progress value={analyticsData.weightEntries.length > 0 ? 100 : 0} className="h-2" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="text-gray-300">Meal Tracking</span>
+                              <span className="text-white">{analyticsData.meals.length > 0 ? "Active" : "Start"}</span>
+                            </div>
+                            <Progress value={analyticsData.meals.length > 0 ? 100 : 0} className="h-2" />
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-white">Medication Adherence</h4>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Metformin:</span>
-                          <span className="font-medium text-white">95%</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-300">Glipizide:</span>
-                          <span className="font-medium text-white">88%</span>
-                        </div>
-                      </div>
-                      <h4 className="font-medium mt-4 text-white">Notable Events</h4>
-                      <div className="text-sm text-gray-300">
-                        <p>• Started new exercise routine (Week 2)</p>
-                        <p>• Adjusted dinner timing (Week 3)</p>
-                        <p>• Reduced carb intake by 20% (Week 4)</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-white">Export Options</CardTitle>
-                  <CardDescription className="text-gray-300">Share your data with healthcare providers</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button className="w-full gradient-primary hover:scale-105 transition-all duration-200 shadow-lg text-white font-semibold">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download PDF Report
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
-                  >
-                    <Share className="h-4 w-4 mr-2" />
-                    Email to Doctor
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
-                  >
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Schedule Review
-                  </Button>
-                  <div className="text-xs text-gray-400 mt-4">
-                    <p className="text-white mb-2">Reports include:</p>
-                    <ul className="list-disc list-inside mt-1 space-y-1">
-                      <li>Glucose trends & patterns</li>
-                      <li>Weight & exercise data</li>
-                      <li>Medication adherence</li>
-                      <li>Goal progress</li>
-                      <li>AI-generated insights</li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </>
+        )}
       </main>
     </div>
   )

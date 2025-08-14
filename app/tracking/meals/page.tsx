@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Utensils, Camera, Search, X } from "lucide-react"
+import { ArrowLeft, Camera, Search, X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { GamificationService } from "@/lib/gamification"
@@ -25,6 +25,19 @@ interface FoodItem {
   calories: number
   protein: number
   fat: number
+}
+
+interface Meal {
+  id: string
+  meal_type: string
+  foods: FoodItem[]
+  notes: string
+  photo_url: string | null
+  timestamp: string
+  total_carbs: number
+  total_calories: number
+  total_protein: number
+  total_fat: number
 }
 
 const commonFoods = [
@@ -46,7 +59,45 @@ export default function MealTrackingPage() {
   const [mealPhoto, setMealPhoto] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [todayMeals, setTodayMeals] = useState<Meal[]>([])
+  const [isLoadingMeals, setIsLoadingMeals] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    fetchTodayMeals()
+  }, [])
+
+  const fetchTodayMeals = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) return
+
+      const today = new Date().toISOString().split("T")[0]
+      const { data, error } = await supabase
+        .from("meals")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("timestamp", `${today}T00:00:00`)
+        .lte("timestamp", `${today}T23:59:59`)
+        .order("timestamp", { ascending: false })
+
+      if (error) {
+        console.error("Error fetching today's meals:", error)
+        return
+      }
+
+      setTodayMeals(data || [])
+    } catch (error) {
+      console.error("Error fetching today's meals:", error)
+    } finally {
+      setIsLoadingMeals(false)
+    }
+  }
 
   const handlePhotoCapture = () => {
     fileInputRef.current?.click()
@@ -136,7 +187,6 @@ export default function MealTrackingPage() {
     setIsLoading(true)
 
     try {
-      const supabase = createClientComponentClient()
       const {
         data: { user },
       } = await supabase.auth.getUser()
@@ -147,6 +197,7 @@ export default function MealTrackingPage() {
         return
       }
 
+      const totals = getTotalNutrition()
       const mealData = {
         user_id: user.id,
         meal_type: mealType,
@@ -165,17 +216,14 @@ export default function MealTrackingPage() {
 
       if (insertError) {
         console.error("Error saving meal:", insertError)
-        // Continue with HP awarding even if database save fails
+        toast.error("Failed to save meal")
+        setIsLoading(false)
+        return
       }
 
       // Award HP for meal tracking
       const gamificationService = new GamificationService()
-      const hpAwarded = await gamificationService.awardHealthPointsFallback(
-        user.id,
-        8,
-        "meal_tracking",
-        `Logged ${mealType} meal`,
-      )
+      await gamificationService.awardHealthPoints(user.id, "logMeal", `Logged ${mealType} meal`)
 
       // Reset form
       setMealType("")
@@ -186,16 +234,10 @@ export default function MealTrackingPage() {
         fileInputRef.current.value = ""
       }
 
-      if (hpAwarded) {
-        toast.success("Meal logged successfully! +8 HP earned 🍽️")
-      } else {
-        toast.success("Meal logged successfully!")
-      }
+      toast.success("Meal logged successfully! +15 HP earned 🍽️")
 
-      // Refresh the page to update HP display
-      setTimeout(() => {
-        window.location.reload()
-      }, 1500)
+      // Refresh today's meals
+      await fetchTodayMeals()
     } catch (error) {
       console.error("Error in meal tracking:", error)
       toast.error("Failed to save meal")
@@ -207,6 +249,28 @@ export default function MealTrackingPage() {
   const filteredFoods = commonFoods.filter((food) => food.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const totals = getTotalNutrition()
+
+  const getMealTypeIcon = (mealType: string) => {
+    switch (mealType) {
+      case "breakfast":
+        return "🌅"
+      case "lunch":
+        return "☀️"
+      case "dinner":
+        return "🌙"
+      case "snack":
+        return "🍎"
+      default:
+        return "🍽️"
+    }
+  }
+
+  const getFoodSummary = (foods: FoodItem[]) => {
+    if (foods.length === 0) return "No foods logged"
+    if (foods.length === 1) return foods[0].name
+    if (foods.length === 2) return `${foods[0].name} and ${foods[1].name}`
+    return `${foods[0].name} and ${foods.length - 1} other${foods.length > 2 ? "s" : ""}`
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
@@ -226,7 +290,7 @@ export default function MealTrackingPage() {
               </Button>
             </Link>
             <div className="flex items-center space-x-3">
-              <Icon3D shape="sphere" color="purple" size="lg" icon={Utensils} />
+              <Icon3D shape="sphere" color="purple" size="lg" />
               <h1 className="text-2xl font-bold text-white">Meal Tracking</h1>
             </div>
           </div>
@@ -238,7 +302,7 @@ export default function MealTrackingPage() {
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Icon3D shape="cube" color="purple" size="sm" icon={Utensils} />
+                <Icon3D shape="cube" color="purple" size="sm" />
                 Log Meal
               </CardTitle>
               <CardDescription className="text-text-secondary">
@@ -247,6 +311,7 @@ export default function MealTrackingPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* ... existing form fields ... */}
                 <div className="space-y-2">
                   <Label htmlFor="mealType" className="text-white">
                     Meal Type
@@ -409,7 +474,7 @@ export default function MealTrackingPage() {
             <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Icon3D shape="torus" color="green" size="sm" icon={Utensils} />
+                  <Icon3D shape="torus" color="green" size="sm" />
                   Nutrition Summary
                 </CardTitle>
                 <CardDescription className="text-text-secondary">Total nutrition for this meal</CardDescription>
@@ -439,29 +504,46 @@ export default function MealTrackingPage() {
             <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Icon3D shape="capsule" color="blue" size="sm" icon={Utensils} />
+                  <Icon3D shape="capsule" color="blue" size="sm" />
                   Today's Meals
                 </CardTitle>
                 <CardDescription className="text-text-secondary">What you've eaten so far today</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center justify-between p-3 glass-card border-white/10 rounded-lg">
-                  <div>
-                    <p className="font-medium text-white">Breakfast</p>
-                    <p className="text-sm text-text-secondary">Oatmeal with berries</p>
+                {isLoadingMeals ? (
+                  <div className="text-center py-8">
+                    <p className="text-text-secondary">Loading your meals...</p>
                   </div>
-                  <Badge className="bg-accent-blue/20 text-accent-blue border-accent-blue/30">30g carbs</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 glass-card border-white/10 rounded-lg">
-                  <div>
-                    <p className="font-medium text-white">Lunch</p>
-                    <p className="text-sm text-text-secondary">Grilled chicken salad</p>
+                ) : todayMeals.length > 0 ? (
+                  todayMeals.map((meal) => (
+                    <div
+                      key={meal.id}
+                      className="flex items-center justify-between p-3 glass-card border-white/10 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{getMealTypeIcon(meal.meal_type)}</span>
+                        <div>
+                          <p className="font-medium text-white capitalize">{meal.meal_type}</p>
+                          <p className="text-sm text-text-secondary">{getFoodSummary(meal.foods)}</p>
+                        </div>
+                      </div>
+                      <Badge className="bg-accent-blue/20 text-accent-blue border-accent-blue/30">
+                        {Math.round(meal.total_carbs)}g carbs
+                      </Badge>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <Icon3D shape="utensils" color="purple" size="lg" className="mx-auto mb-4" />
+                    <h3 className="text-white font-medium mb-2">No meals logged today</h3>
+                    <p className="text-text-secondary text-sm mb-4">
+                      Start tracking your meals to monitor your nutrition and earn Health Points
+                    </p>
+                    <Badge className="bg-accent-purple/20 text-accent-purple border-accent-purple/30">
+                      +15 HP per meal
+                    </Badge>
                   </div>
-                  <Badge className="bg-accent-green/20 text-accent-green border-accent-green/30">15g carbs</Badge>
-                </div>
-                <div className="p-3 border-2 border-dashed border-white/20 rounded-lg text-center text-text-secondary">
-                  Add your next meal
-                </div>
+                )}
               </CardContent>
             </Card>
           </div>
