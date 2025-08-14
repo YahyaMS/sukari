@@ -138,15 +138,17 @@ const nextConfig = {
     }
 
     // Add bundle analyzer in development
-    if (!dev && !isServer) {
-      const { BundleAnalyzerPlugin } = require('@next/bundle-analyzer')()
-      if (process.env.ANALYZE === 'true') {
+    if (!dev && !isServer && process.env.ANALYZE === 'true') {
+      try {
+        const { BundleAnalyzerPlugin } = require('@next/bundle-analyzer')()
         config.plugins.push(
           new BundleAnalyzerPlugin({
             analyzerMode: 'static',
             openAnalyzer: false,
           })
         )
+      } catch (error) {
+        console.warn('Bundle analyzer not available:', error.message)
       }
     }
 
@@ -177,9 +179,9 @@ const nextConfig = {
     ]
   },
 
-  env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
-  },
+  // env: {
+  //   CUSTOM_KEY: process.env.CUSTOM_KEY,
+  // },
 }
 
 export default nextConfig
