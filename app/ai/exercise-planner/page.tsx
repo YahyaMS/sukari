@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { Brain, Dumbbell, Clock, Target, ArrowLeft, Play, CheckCircle } from "lucide-react"
+import { Clock, ArrowLeft, Play, CheckCircle } from "lucide-react"
+import { Icon3D } from "@/components/ui/3d-icon"
 import Link from "next/link"
 
 interface Exercise {
@@ -257,11 +257,11 @@ export default function ExercisePlannerPage() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Beginner":
-        return "bg-green-100 text-green-800"
+        return "bg-accent-green/20 text-accent-green"
       case "Intermediate":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-accent-yellow/20 text-accent-yellow"
       case "Advanced":
-        return "bg-red-100 text-red-800"
+        return "bg-accent-red/20 text-accent-red"
       default:
         return "bg-gray-100 text-gray-800"
     }
@@ -270,58 +270,61 @@ export default function ExercisePlannerPage() {
   const getIntensityColor = (intensity: string) => {
     switch (intensity) {
       case "Low":
-        return "bg-blue-100 text-blue-800"
+        return "bg-accent-blue/20 text-accent-blue"
       case "Moderate":
-        return "bg-orange-100 text-orange-800"
+        return "bg-accent-orange/20 text-accent-orange"
       case "High":
-        return "bg-red-100 text-red-800"
+        return "bg-accent-red/20 text-accent-red"
       default:
         return "bg-gray-100 text-gray-800"
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-3/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-2000" />
+      </div>
+
+      <header className="glass-card border-b border-white/10 relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
             <div className="flex items-center space-x-2">
-              <Brain className="h-6 w-6 text-purple-600" />
-              <h1 className="text-2xl font-bold text-gray-900">AI Exercise Planner</h1>
+              <Icon3D type="cube" color="purple" size="sm" />
+              <h1 className="text-2xl font-bold text-white">AI Exercise Planner</h1>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Preferences Panel */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Target className="h-5 w-5 text-blue-600" />
-                  <span>Exercise Preferences</span>
-                </CardTitle>
-                <CardDescription>Customize your AI-generated workout plan</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <div className="flex items-center space-x-2 mb-2">
+                <Icon3D type="sphere" color="blue" size="sm" />
+                <h2 className="text-xl font-bold text-white">Exercise Preferences</h2>
+              </div>
+              <p className="text-text-secondary mb-6">Customize your AI-generated workout plan</p>
+
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Fitness Level</Label>
+                  <Label className="text-white">Fitness Level</Label>
                   <Select
                     value={preferences.fitnessLevel}
                     onValueChange={(value) => setPreferences((prev) => ({ ...prev, fitnessLevel: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="glass-input">
                       <SelectValue placeholder="Select fitness level" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="glass-card border-white/20">
                       <SelectItem value="beginner">Beginner</SelectItem>
                       <SelectItem value="intermediate">Intermediate</SelectItem>
                       <SelectItem value="advanced">Advanced</SelectItem>
@@ -330,15 +333,15 @@ export default function ExercisePlannerPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Time Available</Label>
+                  <Label className="text-white">Time Available</Label>
                   <Select
                     value={preferences.timeAvailable}
                     onValueChange={(value) => setPreferences((prev) => ({ ...prev, timeAvailable: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="glass-input">
                       <SelectValue placeholder="Select time" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="glass-card border-white/20">
                       <SelectItem value="15">15 minutes</SelectItem>
                       <SelectItem value="30">30 minutes</SelectItem>
                       <SelectItem value="45">45 minutes</SelectItem>
@@ -348,16 +351,17 @@ export default function ExercisePlannerPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Available Equipment</Label>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <Label className="text-white">Available Equipment</Label>
+                  <div className="space-y-2 max-h-32 overflow-y-auto glass-card p-3 border border-white/10">
                     {equipmentOptions.map((equipment) => (
                       <div key={equipment} className="flex items-center space-x-2">
                         <Checkbox
                           id={equipment}
                           checked={preferences.equipment.includes(equipment)}
                           onCheckedChange={(checked) => handleEquipmentChange(equipment, checked as boolean)}
+                          className="border-white/30 data-[state=checked]:bg-accent-purple"
                         />
-                        <Label htmlFor={equipment} className="text-sm">
+                        <Label htmlFor={equipment} className="text-sm text-text-secondary">
                           {equipment}
                         </Label>
                       </div>
@@ -366,16 +370,17 @@ export default function ExercisePlannerPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Health Goals</Label>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <Label className="text-white">Health Goals</Label>
+                  <div className="space-y-2 max-h-32 overflow-y-auto glass-card p-3 border border-white/10">
                     {goalOptions.map((goal) => (
                       <div key={goal} className="flex items-center space-x-2">
                         <Checkbox
                           id={goal}
                           checked={preferences.goals.includes(goal)}
                           onCheckedChange={(checked) => handleGoalChange(goal, checked as boolean)}
+                          className="border-white/30 data-[state=checked]:bg-accent-blue"
                         />
-                        <Label htmlFor={goal} className="text-sm">
+                        <Label htmlFor={goal} className="text-sm text-text-secondary">
                           {goal}
                         </Label>
                       </div>
@@ -384,16 +389,17 @@ export default function ExercisePlannerPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Physical Limitations</Label>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <Label className="text-white">Physical Limitations</Label>
+                  <div className="space-y-2 max-h-32 overflow-y-auto glass-card p-3 border border-white/10">
                     {limitationOptions.map((limitation) => (
                       <div key={limitation} className="flex items-center space-x-2">
                         <Checkbox
                           id={limitation}
                           checked={preferences.limitations.includes(limitation)}
                           onCheckedChange={(checked) => handleLimitationChange(limitation, checked as boolean)}
+                          className="border-white/30 data-[state=checked]:bg-accent-orange"
                         />
-                        <Label htmlFor={limitation} className="text-sm">
+                        <Label htmlFor={limitation} className="text-sm text-text-secondary">
                           {limitation}
                         </Label>
                       </div>
@@ -401,177 +407,172 @@ export default function ExercisePlannerPage() {
                   </div>
                 </div>
 
-                <Button onClick={handleGeneratePlans} className="w-full" disabled={isGenerating}>
+                <Button onClick={handleGeneratePlans} className="btn btn-primary w-full" disabled={isGenerating}>
                   {isGenerating ? (
                     <>
-                      <Brain className="h-4 w-4 mr-2 animate-pulse" />
+                      <Icon3D type="sphere" color="purple" size="xs" className="mr-2 animate-pulse" />
                       Generating...
                     </>
                   ) : (
                     <>
-                      <Brain className="h-4 w-4 mr-2" />
+                      <Icon3D type="cube" color="white" size="xs" className="mr-2" />
                       Generate AI Workout Plan
                     </>
                   )}
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
-          {/* Generated Plans */}
           <div className="lg:col-span-2">
             {generatedPlans.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <Dumbbell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">AI-Powered Exercise Planning</h3>
-                  <p className="text-gray-600 mb-4">
-                    Get personalized workout plans optimized for glucose control, based on your fitness level, available
-                    time, and health goals.
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Set your preferences and click "Generate AI Workout Plan" to start
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="glass-card p-12 text-center ring-gradient animate-fade-in-up">
+                <Icon3D type="capsule" color="blue" size="lg" className="mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">AI-Powered Exercise Planning</h3>
+                <p className="text-text-secondary mb-4">
+                  Get personalized workout plans optimized for glucose control, based on your fitness level, available
+                  time, and health goals.
+                </p>
+                <p className="text-sm text-text-muted">
+                  Set your preferences and click "Generate AI Workout Plan" to start
+                </p>
+              </div>
             ) : (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold">AI-Generated Workout Plans</h2>
-                  <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                  <h2 className="text-xl font-bold text-white">AI-Generated Workout Plans</h2>
+                  <Badge className="bg-accent-purple/20 text-accent-purple border-accent-purple/30">
                     Optimized for glucose control
                   </Badge>
                 </div>
 
                 <div className="grid gap-6">
                   {generatedPlans.map((plan) => (
-                    <Card key={plan.id} className="hover:shadow-md transition-shadow">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <CardTitle className="flex items-center space-x-2">
-                              <span>{plan.name}</span>
-                              <Badge variant="secondary" className={getDifficultyColor(plan.difficulty)}>
-                                {plan.difficulty}
-                              </Badge>
-                            </CardTitle>
-                            <CardDescription className="flex items-center space-x-4 mt-2">
-                              <span className="flex items-center space-x-1">
-                                <Clock className="h-3 w-3" />
-                                <span>{plan.duration} min</span>
-                              </span>
-                              <span>{plan.totalCalories} calories</span>
-                              <div className="flex space-x-1">
-                                {plan.focus.map((focus) => (
-                                  <Badge key={focus} variant="secondary" className="text-xs">
-                                    {focus}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </CardDescription>
+                    <div
+                      key={plan.id}
+                      className="glass-card p-6 hover-glow hover-lift ring-gradient animate-fade-in-up"
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <h3 className="text-xl font-bold text-white">{plan.name}</h3>
+                            <Badge className={`${getDifficultyColor(plan.difficulty)} border-0`}>
+                              {plan.difficulty}
+                            </Badge>
                           </div>
-                          <Button
-                            variant={selectedPlan?.id === plan.id ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setSelectedPlan(selectedPlan?.id === plan.id ? null : plan)}
-                            className={selectedPlan?.id !== plan.id ? "bg-transparent" : ""}
-                          >
-                            {selectedPlan?.id === plan.id ? "Hide Details" : "View Details"}
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div>
-                            <h4 className="font-medium mb-2">Exercises ({plan.exercises.length})</h4>
-                            <div className="grid gap-2">
-                              {plan.exercises.map((exercise) => (
-                                <div
-                                  key={exercise.id}
-                                  className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                          <div className="flex items-center space-x-4 text-text-secondary">
+                            <span className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>{plan.duration} min</span>
+                            </span>
+                            <span>{plan.totalCalories} calories</span>
+                            <div className="flex space-x-1">
+                              {plan.focus.map((focus) => (
+                                <Badge
+                                  key={focus}
+                                  className="bg-accent-blue/20 text-accent-blue border-accent-blue/30 text-xs"
                                 >
+                                  {focus}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          variant={selectedPlan?.id === plan.id ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedPlan(selectedPlan?.id === plan.id ? null : plan)}
+                          className={selectedPlan?.id !== plan.id ? "glass-button" : "btn btn-primary"}
+                        >
+                          {selectedPlan?.id === plan.id ? "Hide Details" : "View Details"}
+                        </Button>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-medium text-white mb-2">Exercises ({plan.exercises.length})</h4>
+                          <div className="grid gap-2">
+                            {plan.exercises.map((exercise) => (
+                              <div
+                                key={exercise.id}
+                                className="flex items-center justify-between p-3 glass-card border border-white/10"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <div className="w-2 h-2 bg-accent-blue rounded-full" />
+                                  <span className="font-medium text-sm text-white">{exercise.name}</span>
+                                  <Badge className={`${getIntensityColor(exercise.intensity)} border-0 text-xs`}>
+                                    {exercise.intensity}
+                                  </Badge>
+                                </div>
+                                <div className="text-xs text-text-secondary">
+                                  {exercise.duration} min • {exercise.caloriesBurned} cal
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {selectedPlan?.id === plan.id && (
+                          <div className="space-y-4 border-t border-white/10 pt-4">
+                            <h4 className="font-medium text-white">Detailed Exercise Instructions</h4>
+                            {plan.exercises.map((exercise) => (
+                              <div key={exercise.id} className="glass-card p-4 border border-white/10">
+                                <div className="flex items-center justify-between mb-3">
+                                  <h5 className="text-base font-medium text-white">{exercise.name}</h5>
                                   <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                                    <span className="font-medium text-sm">{exercise.name}</span>
-                                    <Badge
-                                      variant="secondary"
-                                      className={getIntensityColor(exercise.intensity)}
-                                      size="sm"
-                                    >
-                                      {exercise.intensity}
+                                    <Badge className="bg-accent-green/20 text-accent-green border-accent-green/30 text-xs capitalize">
+                                      {exercise.type}
+                                    </Badge>
+                                    <Badge className="bg-accent-orange/20 text-accent-orange border-accent-orange/30 text-xs">
+                                      -{exercise.glucoseImpact} mg/dL
                                     </Badge>
                                   </div>
-                                  <div className="text-xs text-gray-600">
-                                    {exercise.duration} min • {exercise.caloriesBurned} cal
+                                </div>
+
+                                <div className="space-y-3">
+                                  <div>
+                                    <h6 className="font-medium text-sm text-white mb-1">Instructions:</h6>
+                                    <ul className="text-sm text-text-secondary space-y-1">
+                                      {exercise.instructions.map((instruction, index) => (
+                                        <li key={index}>• {instruction}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  {exercise.modifications.length > 0 && (
+                                    <div>
+                                      <h6 className="font-medium text-sm text-white mb-1">Modifications:</h6>
+                                      <ul className="text-sm text-text-secondary space-y-1">
+                                        {exercise.modifications.map((modification, index) => (
+                                          <li key={index}>• {modification}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  <div>
+                                    <h6 className="font-medium text-sm text-white mb-1">Benefits:</h6>
+                                    <ul className="text-sm text-text-secondary space-y-1">
+                                      {exercise.benefits.map((benefit, index) => (
+                                        <li key={index}>• {benefit}</li>
+                                      ))}
+                                    </ul>
                                   </div>
                                 </div>
-                              ))}
+                              </div>
+                            ))}
+                            <div className="flex space-x-2">
+                              <Button className="btn btn-primary flex-1">
+                                <Play className="h-4 w-4 mr-2" />
+                                Start Workout
+                              </Button>
+                              <Button className="btn btn-secondary flex-1">
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Save to My Plans
+                              </Button>
                             </div>
                           </div>
-
-                          {selectedPlan?.id === plan.id && (
-                            <div className="space-y-4 border-t pt-4">
-                              <h4 className="font-medium">Detailed Exercise Instructions</h4>
-                              {plan.exercises.map((exercise) => (
-                                <Card key={exercise.id} className="bg-gray-50">
-                                  <CardHeader className="pb-2">
-                                    <CardTitle className="text-base flex items-center justify-between">
-                                      <span>{exercise.name}</span>
-                                      <div className="flex items-center space-x-2">
-                                        <Badge variant="secondary" className="text-xs capitalize">
-                                          {exercise.type}
-                                        </Badge>
-                                        <Badge variant="secondary" className="text-xs">
-                                          -{exercise.glucoseImpact} mg/dL
-                                        </Badge>
-                                      </div>
-                                    </CardTitle>
-                                  </CardHeader>
-                                  <CardContent className="space-y-3">
-                                    <div>
-                                      <h5 className="font-medium text-sm mb-1">Instructions:</h5>
-                                      <ul className="text-sm text-gray-600 space-y-1">
-                                        {exercise.instructions.map((instruction, index) => (
-                                          <li key={index}>• {instruction}</li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                    {exercise.modifications.length > 0 && (
-                                      <div>
-                                        <h5 className="font-medium text-sm mb-1">Modifications:</h5>
-                                        <ul className="text-sm text-gray-600 space-y-1">
-                                          {exercise.modifications.map((modification, index) => (
-                                            <li key={index}>• {modification}</li>
-                                          ))}
-                                        </ul>
-                                      </div>
-                                    )}
-                                    <div>
-                                      <h5 className="font-medium text-sm mb-1">Benefits:</h5>
-                                      <ul className="text-sm text-gray-600 space-y-1">
-                                        {exercise.benefits.map((benefit, index) => (
-                                          <li key={index}>• {benefit}</li>
-                                        ))}
-                                      </ul>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              ))}
-                              <div className="flex space-x-2">
-                                <Button className="flex-1">
-                                  <Play className="h-4 w-4 mr-2" />
-                                  Start Workout
-                                </Button>
-                                <Button variant="outline" className="flex-1 bg-transparent">
-                                  <CheckCircle className="h-4 w-4 mr-2" />
-                                  Save to My Plans
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
+                        )}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>

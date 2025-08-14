@@ -2,14 +2,14 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, Lightbulb, Calendar, MessageCircle, Star, Clock, Bot, Sparkles } from "lucide-react"
+import { ArrowLeft, MessageCircle, Star, Clock, Bot, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Icon3D } from "@/components/ui/3d-icon"
 import { useToast } from "@/hooks/use-toast"
 
 export default function AskExpertPage() {
@@ -161,47 +161,55 @@ export default function AskExpertPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-3/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-2000" />
+      </div>
+
+      <header className="glass-card border-b border-white/10 relative z-10">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link href="/community">
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Ask an Expert</h1>
-                <p className="text-sm text-gray-600">Get professional guidance from healthcare experts</p>
+              <div className="flex items-center gap-2">
+                <Icon3D type="sphere" color="blue" size="sm" />
+                <div>
+                  <h1 className="text-2xl font-bold text-white">Ask an Expert</h1>
+                  <p className="text-sm text-text-secondary">Get professional guidance from healthcare experts</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Ask a Question */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-blue-600" />
-                  Ask Your Question
-                </CardTitle>
-                <CardDescription>Get expert answers to your health questions</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon3D type="capsule" color="blue" size="sm" />
+                <h2 className="text-xl font-bold text-white">Ask Your Question</h2>
+              </div>
+              <p className="text-text-secondary mb-6">Get expert answers to your health questions</p>
+
+              <div className="space-y-4">
                 <div>
-                  <Label htmlFor="category">Question Category</Label>
+                  <Label htmlFor="category" className="text-white">
+                    Question Category
+                  </Label>
                   <Select value={questionCategory} onValueChange={setQuestionCategory}>
-                    <SelectTrigger>
+                    <SelectTrigger className="glass-input">
                       <SelectValue placeholder="Select a category" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="glass-card border-white/20">
                       <SelectItem value="blood-sugar">Blood Sugar Management</SelectItem>
                       <SelectItem value="nutrition">Nutrition & Diet</SelectItem>
                       <SelectItem value="exercise">Exercise & Fitness</SelectItem>
@@ -213,22 +221,24 @@ export default function AskExpertPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="question">Your Question</Label>
+                  <Label htmlFor="question" className="text-white">
+                    Your Question
+                  </Label>
                   <Textarea
                     id="question"
                     placeholder="Describe your question in detail. Include relevant context like your current medications, symptoms, or specific situations..."
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
                     rows={4}
+                    className="glass-input"
                   />
                 </div>
 
-                {/* AI Suggestions */}
-                <div className="bg-purple-50 rounded-lg p-4">
+                <div className="glass-card p-4 border border-accent-purple/20">
                   <div className="flex items-center gap-2 mb-3">
-                    <Bot className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm font-medium text-purple-800">AI Suggested Questions</span>
-                    <Badge variant="secondary" className="text-xs">
+                    <Bot className="h-4 w-4 text-accent-purple" />
+                    <span className="text-sm font-medium text-white">AI Suggested Questions</span>
+                    <Badge className="bg-accent-purple/20 text-accent-purple border-accent-purple/30 text-xs">
                       <Sparkles className="h-3 w-3 mr-1" />
                       Popular
                     </Badge>
@@ -238,7 +248,7 @@ export default function AskExpertPage() {
                       <button
                         key={index}
                         onClick={() => setQuestion(suggestion)}
-                        className="block w-full text-left text-sm text-purple-700 hover:text-purple-900 hover:bg-purple-100 p-2 rounded transition-colors"
+                        className="block w-full text-left text-sm text-text-secondary hover:text-white hover:bg-white/10 p-2 rounded transition-colors"
                       >
                         {suggestion}
                       </button>
@@ -247,42 +257,40 @@ export default function AskExpertPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button className="flex-1" onClick={handleSubmitQuestion} disabled={isSubmitting}>
+                  <Button className="btn btn-primary flex-1" onClick={handleSubmitQuestion} disabled={isSubmitting}>
                     <MessageCircle className="h-4 w-4 mr-2" />
                     {isSubmitting ? "Submitting..." : "Submit Question"}
                   </Button>
                   <Link href="/coaching/schedule">
-                    <Button variant="outline">
-                      <Calendar className="h-4 w-4 mr-2" />
+                    <Button className="btn btn-secondary">
+                      <Icon3D type="cube" color="white" size="xs" className="mr-2" />
                       Schedule 1:1 Session
                     </Button>
                   </Link>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Recent Questions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Community Questions</CardTitle>
-                <CardDescription>See what others are asking and learn from expert answers</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <h2 className="text-xl font-bold text-white mb-2">Recent Community Questions</h2>
+              <p className="text-text-secondary mb-6">See what others are asking and learn from expert answers</p>
+
+              <div className="space-y-4">
                 {recentQuestions.map((item, index) => (
-                  <div key={index} className="border rounded-lg p-4">
+                  <div key={index} className="glass-card p-4 border border-white/10 hover-glow">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h4 className="font-medium text-gray-900">{item.question}</h4>
+                        <h4 className="font-medium text-white">{item.question}</h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge className="bg-accent-blue/20 text-accent-blue border-accent-blue/30 text-xs">
                             {item.category}
                           </Badge>
-                          <span className="text-sm text-gray-600">Answered by {item.expert}</span>
+                          <span className="text-sm text-text-secondary">Answered by {item.expert}</span>
                         </div>
                       </div>
-                      <span className="text-xs text-gray-500">{item.timeAgo}</span>
+                      <span className="text-xs text-text-muted">{item.timeAgo}</span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-4 text-sm text-text-secondary">
                       <div className="flex items-center gap-1">
                         <MessageCircle className="h-4 w-4" />
                         {item.answers} answers
@@ -291,31 +299,29 @@ export default function AskExpertPage() {
                         <Star className="h-4 w-4" />
                         {item.likes} helpful
                       </div>
-                      <Button variant="ghost" size="sm" className="ml-auto">
+                      <Button variant="ghost" size="sm" className="ml-auto text-white hover:bg-white/10">
                         View Answer
                       </Button>
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Featured Experts */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Featured Experts</CardTitle>
-                <CardDescription>Healthcare professionals ready to help</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <h2 className="text-xl font-bold text-white mb-2">Featured Experts</h2>
+              <p className="text-text-secondary mb-6">Healthcare professionals ready to help</p>
+
+              <div className="space-y-4">
                 {experts.map((expert, index) => (
-                  <div key={index} className="border rounded-lg p-3">
+                  <div key={index} className="glass-card p-3 border border-white/10">
                     <div className="flex items-start gap-3 mb-3">
                       <Avatar>
                         <AvatarImage src={expert.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>
+                        <AvatarFallback className="bg-accent-blue/20 text-accent-blue">
                           {expert.name
                             .split(" ")
                             .map((n) => n[0])
@@ -323,85 +329,82 @@ export default function AskExpertPage() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 text-sm">{expert.name}</h4>
-                        <p className="text-xs text-gray-600">{expert.title}</p>
+                        <h4 className="font-semibold text-white text-sm">{expert.name}</h4>
+                        <p className="text-xs text-text-secondary">{expert.title}</p>
                         <div className="flex items-center gap-1 mt-1">
-                          <Star className="h-3 w-3 text-yellow-500" />
-                          <span className="text-xs text-gray-600">{expert.rating}</span>
-                          <span className="text-xs text-gray-500">({expert.sessionsCompleted} sessions)</span>
+                          <Star className="h-3 w-3 text-accent-yellow" />
+                          <span className="text-xs text-text-secondary">{expert.rating}</span>
+                          <span className="text-xs text-text-muted">({expert.sessionsCompleted} sessions)</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-3">
                       {expert.specialties.map((specialty, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
+                        <Badge
+                          key={idx}
+                          className="bg-accent-green/20 text-accent-green border-accent-green/30 text-xs"
+                        >
                           {specialty}
                         </Badge>
                       ))}
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <div className="text-xs text-gray-600">
+                      <div className="text-xs text-text-secondary">
                         <Clock className="h-3 w-3 inline mr-1" />
                         {expert.nextAvailable}
                       </div>
                       <Link href={`/coaching/schedule?expert=${expert.id}`}>
-                        <Button size="sm" variant="outline">
+                        <Button size="sm" className="btn btn-secondary text-xs">
                           Book Session
                         </Button>
                       </Link>
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Upcoming Sessions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  Upcoming Sessions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon3D type="cube" color="green" size="sm" />
+                <h2 className="text-xl font-bold text-white">Upcoming Sessions</h2>
+              </div>
+
+              <div className="space-y-4 mt-6">
                 {upcomingSessions.map((session, index) => (
-                  <div key={index} className="border-l-4 border-blue-500 pl-3">
-                    <h4 className="font-medium text-gray-900 text-sm">{session.title}</h4>
-                    <p className="text-xs text-gray-600 mb-1">{session.topic}</p>
+                  <div key={index} className="border-l-4 border-accent-blue pl-3">
+                    <h4 className="font-medium text-white text-sm">{session.title}</h4>
+                    <p className="text-xs text-text-secondary mb-1">{session.topic}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">{session.date}</span>
-                      <span className="text-xs text-gray-500">{session.participants} joining</span>
+                      <span className="text-xs text-text-muted">{session.date}</span>
+                      <span className="text-xs text-text-muted">{session.participants} joining</span>
                     </div>
                   </div>
                 ))}
-                <Button variant="outline" size="sm" className="w-full bg-transparent">
-                  View All Sessions
-                </Button>
-              </CardContent>
-            </Card>
+                <Button className="btn btn-secondary w-full text-sm">View All Sessions</Button>
+              </div>
+            </div>
 
-            {/* Quick Tips */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Expert Tips</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="bg-blue-50 p-3 rounded-lg">
-                  <p className="text-sm text-blue-800 font-medium">💡 Tip of the Day</p>
-                  <p className="text-sm text-blue-700 mt-1">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <h2 className="text-xl font-bold text-white mb-4">Expert Tips</h2>
+
+              <div className="space-y-3">
+                <div className="glass-card p-3 border border-accent-blue/20">
+                  <p className="text-sm text-accent-blue font-medium">💡 Tip of the Day</p>
+                  <p className="text-sm text-text-secondary mt-1">
                     Check your blood sugar 2 hours after meals to understand how different foods affect you.
                   </p>
                 </div>
-                <div className="bg-green-50 p-3 rounded-lg">
-                  <p className="text-sm text-green-800 font-medium">🥗 Nutrition Tip</p>
-                  <p className="text-sm text-green-700 mt-1">
+                <div className="glass-card p-3 border border-accent-green/20">
+                  <p className="text-sm text-accent-green font-medium">🥗 Nutrition Tip</p>
+                  <p className="text-sm text-text-secondary mt-1">
                     Pair carbs with protein and fiber to slow glucose absorption and reduce spikes.
                   </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>

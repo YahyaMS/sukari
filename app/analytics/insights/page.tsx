@@ -1,20 +1,9 @@
 "use client"
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import {
-  Brain,
-  TrendingUp,
-  TrendingDown,
-  AlertTriangle,
-  CheckCircle,
-  Lightbulb,
-  ArrowLeft,
-  Calendar,
-  Activity,
-} from "lucide-react"
+import { TrendingUp, TrendingDown, CheckCircle, ArrowLeft, Calendar, Activity } from "lucide-react"
+import { Icon3D } from "@/components/ui/3d-icon"
 import Link from "next/link"
 
 const insights = [
@@ -104,11 +93,11 @@ export default function InsightsPage() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
-        return "bg-red-100 text-red-800"
+        return "bg-accent-red/20 text-accent-red border-accent-red/30"
       case "medium":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-accent-yellow/20 text-accent-yellow border-accent-yellow/30"
       case "low":
-        return "bg-blue-100 text-blue-800"
+        return "bg-accent-blue/20 text-accent-blue border-accent-blue/30"
       default:
         return "bg-gray-100 text-gray-800"
     }
@@ -117,81 +106,83 @@ export default function InsightsPage() {
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case "Low":
-        return "text-green-600"
+        return "text-accent-green"
       case "Medium":
-        return "text-yellow-600"
+        return "text-accent-yellow"
       case "High":
-        return "text-red-600"
+        return "text-accent-red"
       default:
-        return "text-gray-600"
+        return "text-text-secondary"
     }
   }
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case "improving":
-        return <TrendingUp className="h-4 w-4 text-green-600" />
+        return <TrendingUp className="h-4 w-4 text-accent-green" />
       case "declining":
-        return <TrendingDown className="h-4 w-4 text-red-600" />
+        return <TrendingDown className="h-4 w-4 text-accent-red" />
       default:
-        return <Activity className="h-4 w-4 text-gray-600" />
+        return <Activity className="h-4 w-4 text-text-secondary" />
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-3/4 right-1/4 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-2000" />
+      </div>
+
+      <header className="glass-card border-b border-white/10 relative z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-4">
             <Link href="/analytics">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
             <div className="flex items-center space-x-2">
-              <Brain className="h-6 w-6 text-purple-600" />
-              <h1 className="text-2xl font-bold text-gray-900">AI Health Insights</h1>
+              <Icon3D type="cube" color="purple" size="sm" />
+              <h1 className="text-2xl font-bold text-white">AI Health Insights</h1>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Insights */}
           <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Lightbulb className="h-5 w-5 text-yellow-600" />
-                  <span>Personalized Insights</span>
-                </CardTitle>
-                <CardDescription>AI-powered analysis of your health patterns and trends</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <div className="flex items-center space-x-2 mb-2">
+                <Icon3D type="sphere" color="yellow" size="sm" />
+                <h2 className="text-xl font-bold text-white">Personalized Insights</h2>
+              </div>
+              <p className="text-text-secondary mb-6">AI-powered analysis of your health patterns and trends</p>
+
+              <div className="space-y-6">
                 {insights.map((insight) => (
-                  <div key={insight.id} className="border rounded-lg p-4 space-y-3">
+                  <div key={insight.id} className="glass-card p-4 border border-white/10 hover-glow">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="font-medium">{insight.title}</h3>
-                          <Badge variant="secondary" className={getPriorityColor(insight.priority)}>
-                            {insight.priority} priority
-                          </Badge>
+                          <h3 className="font-medium text-white">{insight.title}</h3>
+                          <Badge className={getPriorityColor(insight.priority)}>{insight.priority} priority</Badge>
                           {insight.actionable && (
-                            <Badge variant="secondary" className="bg-green-100 text-green-800">
+                            <Badge className="bg-accent-green/20 text-accent-green border-accent-green/30">
                               Actionable
                             </Badge>
                           )}
                         </div>
-                        <p className="text-gray-600 text-sm mb-3">{insight.description}</p>
-                        <div className="bg-blue-50 p-3 rounded-lg mb-3">
-                          <p className="text-sm text-blue-800">
+                        <p className="text-text-secondary text-sm mb-3">{insight.description}</p>
+                        <div className="glass-card p-3 border border-accent-blue/20 mb-3">
+                          <p className="text-sm text-accent-blue">
                             <strong>Recommendation:</strong> {insight.recommendation}
                           </p>
                         </div>
-                        <div className="flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex items-center justify-between text-xs text-text-muted">
                           <span>{insight.data}</span>
                           <div className="flex items-center space-x-2">
                             <span>Confidence:</span>
@@ -203,117 +194,108 @@ export default function InsightsPage() {
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            {/* Predictive Analytics */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Predictive Analytics</CardTitle>
-                <CardDescription>Forecasts based on your current health trends</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-green-50 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <TrendingDown className="h-5 w-5 text-green-600" />
-                      <h4 className="font-medium text-green-900">HbA1c Prediction</h4>
-                    </div>
-                    <p className="text-2xl font-bold text-green-600">6.9%</p>
-                    <p className="text-sm text-green-800">Expected by March 2024</p>
-                    <p className="text-xs text-green-700 mt-1">89% confidence</p>
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <h2 className="text-xl font-bold text-white mb-2">Predictive Analytics</h2>
+              <p className="text-text-secondary mb-6">Forecasts based on your current health trends</p>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="glass-card p-4 border border-accent-green/20">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <TrendingDown className="h-5 w-5 text-accent-green" />
+                    <h4 className="font-medium text-white">HbA1c Prediction</h4>
                   </div>
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <TrendingDown className="h-5 w-5 text-blue-600" />
-                      <h4 className="font-medium text-blue-900">Weight Goal</h4>
-                    </div>
-                    <p className="text-2xl font-bold text-blue-600">165 lbs</p>
-                    <p className="text-sm text-blue-800">Expected by June 2024</p>
-                    <p className="text-xs text-blue-700 mt-1">76% confidence</p>
-                  </div>
+                  <p className="text-2xl font-bold text-accent-green">6.9%</p>
+                  <p className="text-sm text-text-secondary">Expected by March 2024</p>
+                  <p className="text-xs text-text-muted mt-1">89% confidence</p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="glass-card p-4 border border-accent-blue/20">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <TrendingDown className="h-5 w-5 text-accent-blue" />
+                    <h4 className="font-medium text-white">Weight Goal</h4>
+                  </div>
+                  <p className="text-2xl font-bold text-accent-blue">165 lbs</p>
+                  <p className="text-sm text-text-secondary">Expected by June 2024</p>
+                  <p className="text-xs text-text-muted mt-1">76% confidence</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Risk Assessment Sidebar */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <AlertTriangle className="h-5 w-5 text-orange-600" />
-                  <span>Risk Assessment</span>
-                </CardTitle>
-                <CardDescription>Current health risk factors and trends</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <div className="flex items-center space-x-2 mb-2">
+                <Icon3D type="triangle" color="orange" size="sm" />
+                <h2 className="text-xl font-bold text-white">Risk Assessment</h2>
+              </div>
+              <p className="text-text-secondary mb-6">Current health risk factors and trends</p>
+
+              <div className="space-y-4">
                 {riskFactors.map((factor, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{factor.factor}</span>
+                      <span className="text-sm font-medium text-white">{factor.factor}</span>
                       <div className="flex items-center space-x-1">
                         {getTrendIcon(factor.trend)}
                         <span className={`text-sm font-medium ${getRiskColor(factor.risk)}`}>{factor.risk}</span>
                       </div>
                     </div>
                     <Progress value={factor.score} className="h-2" />
-                    <p className="text-xs text-gray-600">{factor.description}</p>
+                    <p className="text-xs text-text-secondary">{factor.description}</p>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-                <CardDescription>Based on your insights</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full justify-start" size="sm">
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <h2 className="text-xl font-bold text-white mb-2">Quick Actions</h2>
+              <p className="text-text-secondary mb-6">Based on your insights</p>
+
+              <div className="space-y-3">
+                <Button className="btn btn-primary w-full justify-start" size="sm">
                   <Calendar className="h-4 w-4 mr-2" />
                   Schedule Coach Check-in
                 </Button>
-                <Button variant="outline" className="w-full justify-start bg-transparent" size="sm">
+                <Button className="btn btn-secondary w-full justify-start" size="sm">
                   <Activity className="h-4 w-4 mr-2" />
                   Update Exercise Plan
                 </Button>
-                <Button variant="outline" className="w-full justify-start bg-transparent" size="sm">
+                <Button className="btn btn-secondary w-full justify-start" size="sm">
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Mark Insight as Applied
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Insight Summary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span>Total Insights:</span>
-                    <span className="font-medium">{insights.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>High Priority:</span>
-                    <span className="font-medium text-red-600">
-                      {insights.filter((i) => i.priority === "high").length}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Actionable:</span>
-                    <span className="font-medium text-green-600">{insights.filter((i) => i.actionable).length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Avg Confidence:</span>
-                    <span className="font-medium">
-                      {Math.round(insights.reduce((sum, i) => sum + i.confidence, 0) / insights.length)}%
-                    </span>
-                  </div>
+            <div className="glass-card p-6 ring-gradient animate-fade-in-up">
+              <h2 className="text-xl font-bold text-white mb-4">Insight Summary</h2>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-text-secondary">Total Insights:</span>
+                  <span className="font-medium text-white">{insights.length}</span>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex justify-between">
+                  <span className="text-text-secondary">High Priority:</span>
+                  <span className="font-medium text-accent-red">
+                    {insights.filter((i) => i.priority === "high").length}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-text-secondary">Actionable:</span>
+                  <span className="font-medium text-accent-green">{insights.filter((i) => i.actionable).length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-text-secondary">Avg Confidence:</span>
+                  <span className="font-medium text-white">
+                    {Math.round(insights.reduce((sum, i) => sum + i.confidence, 0) / insights.length)}%
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
