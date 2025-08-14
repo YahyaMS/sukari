@@ -13,7 +13,7 @@ import { FileText, Upload, X } from "lucide-react"
 interface LabResultsModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (file: File, notes: string) => void
+  onSubmit: (fileUrl: string, notes: string) => void
 }
 
 export default function LabResultsModal({ isOpen, onClose, onSubmit }: LabResultsModalProps) {
@@ -40,12 +40,27 @@ export default function LabResultsModal({ isOpen, onClose, onSubmit }: LabResult
 
     setIsSubmitting(true)
     try {
-      await onSubmit(selectedFile, notes)
-      // Reset form
+      const formData = new FormData()
+      formData.append("file", selectedFile)
+
+      const uploadResponse = await fetch("/api/upload-lab-results", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload file")
+      }
+
+      const { url } = await uploadResponse.json()
+
+      await onSubmit(url, notes)
+
       setSelectedFile(null)
       setNotes("")
     } catch (error) {
       console.error("Error submitting lab results:", error)
+      alert("Failed to upload lab results. Please try again.")
     } finally {
       setIsSubmitting(false)
     }

@@ -14,7 +14,7 @@ import { Camera, Upload, X } from "lucide-react"
 interface ProgressPhotoModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (file: File, photoType: string, notes: string) => void
+  onSubmit: (fileUrl: string, photoType: string, notes: string) => void
 }
 
 export default function ProgressPhotoModal({ isOpen, onClose, onSubmit }: ProgressPhotoModalProps) {
@@ -46,7 +46,24 @@ export default function ProgressPhotoModal({ isOpen, onClose, onSubmit }: Progre
 
     setIsSubmitting(true)
     try {
-      await onSubmit(selectedFile, photoType, notes)
+      const formData = new FormData()
+      formData.append("file", selectedFile)
+      formData.append("photoType", photoType)
+
+      const uploadResponse = await fetch("/api/upload-progress-photo", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error("Failed to upload photo")
+      }
+
+      const { url } = await uploadResponse.json()
+
+      // Pass the Blob URL instead of the raw file
+      await onSubmit(url, photoType, notes)
+
       // Reset form
       setSelectedFile(null)
       setPhotoType("")
@@ -57,6 +74,7 @@ export default function ProgressPhotoModal({ isOpen, onClose, onSubmit }: Progre
       }
     } catch (error) {
       console.error("Error submitting progress photo:", error)
+      alert("Failed to upload progress photo. Please try again.")
     } finally {
       setIsSubmitting(false)
     }

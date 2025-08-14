@@ -41,14 +41,28 @@ export default function WeightTrackingPage() {
     fileInputRef.current?.click()
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        setProgressPhoto(e.target?.result as string)
+      try {
+        const formData = new FormData()
+        formData.append("file", file)
+
+        const uploadResponse = await fetch("/api/upload-progress-photo", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!uploadResponse.ok) {
+          throw new Error("Failed to upload photo")
+        }
+
+        const { url } = await uploadResponse.json()
+        setProgressPhoto(url)
+      } catch (error) {
+        console.error("Error uploading photo:", error)
+        alert("Failed to upload photo. Please try again.")
       }
-      reader.readAsDataURL(file)
     }
   }
 

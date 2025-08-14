@@ -106,10 +106,21 @@ export default function MealTrackingPage() {
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        const photoData = e.target?.result as string
-        setMealPhoto(photoData)
+      try {
+        const formData = new FormData()
+        formData.append("file", file)
+
+        const uploadResponse = await fetch("/api/upload-meal-photo", {
+          method: "POST",
+          body: formData,
+        })
+
+        if (!uploadResponse.ok) {
+          throw new Error("Failed to upload photo")
+        }
+
+        const { url } = await uploadResponse.json()
+        setMealPhoto(url)
 
         // Simulate AI food recognition
         setIsAnalyzing(true)
@@ -134,8 +145,10 @@ export default function MealTrackingPage() {
           setFoods(newFoods)
           setIsAnalyzing(false)
         }, 2000)
+      } catch (error) {
+        console.error("Error uploading photo:", error)
+        alert("Failed to upload photo. Please try again.")
       }
-      reader.readAsDataURL(file)
     }
   }
 
