@@ -1,40 +1,67 @@
-"use client"
-
-import { useState } from "react"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Camera, Edit, MapPin, Phone, Mail, Calendar, Activity, Target, Award } from "lucide-react"
+import { ArrowLeft, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Icon3D } from "@/components/ui/3d-icon"
+import { ProfileEditForm } from "@/components/profile/profile-edit-form"
 
-export default function ProfilePage() {
-  const [isEditing, setIsEditing] = useState(false)
-  const [profile, setProfile] = useState({
-    firstName: "Sarah",
-    lastName: "Johnson",
-    email: "sarah.johnson@email.com",
-    phone: "+1 (555) 123-4567",
-    dateOfBirth: "1978-05-15",
-    gender: "female",
-    height: "165",
-    location: "San Francisco, CA",
-    bio: "Managing Type 2 diabetes with lifestyle changes. Love hiking and cooking healthy meals.",
-    emergencyContact: "John Johnson - +1 (555) 987-6543",
-  })
+export default async function ProfilePage() {
+  const cookieStore = cookies()
+  const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
+  // Check if user is authenticated
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect("/auth/login")
+  }
+
+  // Fetch user profile
+  const { data: profile } = await supabase.from("user_profiles").select("*").eq("id", user.id).single()
+
+  const firstName = profile?.first_name || user.user_metadata?.first_name || "User"
+  const lastName = profile?.last_name || user.user_metadata?.last_name || ""
+  const email = user.email || ""
+  const phone = profile?.phone || ""
+  const dateOfBirth = profile?.date_of_birth || ""
+  const gender = profile?.gender || ""
+  const height = profile?.height_cm || ""
+  const location = profile?.location || ""
+  const bio = profile?.bio || "Managing my health journey with MetaReverse."
+  const emergencyContact = profile?.emergency_contact || ""
+
+  // Fetch health data
+  const { data: latestWeight } = await supabase
+    .from("weight_entries")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("timestamp", { ascending: false })
+    .limit(1)
+    .single()
+
+  const { data: latestGlucose } = await supabase
+    .from("glucose_readings")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("timestamp", { ascending: false })
+    .limit(1)
+    .single()
+
+  // Calculate health stats
   const healthStats = {
-    currentWeight: 68.5,
-    targetWeight: 65,
-    avgGlucose: 142,
+    currentWeight: latestWeight?.weight_kg || 0,
+    targetWeight: profile?.target_weight_kg || 70,
+    avgGlucose: latestGlucose?.value || 0,
     targetGlucose: 120,
-    hba1c: 7.2,
+    hba1c: profile?.latest_hba1c || 0,
     targetHba1c: 6.5,
   }
 
@@ -72,10 +99,9 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0D1117] via-[#161B22] to-[#21262D] relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-br from-green-500/20 to-teal-500/20 rounded-full blur-lg animate-bounce"></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-pink-500/20 to-purple-500/20 rounded-full blur-xl animate-bounce"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-green-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
       </div>
 
       <div className="glass-card border-b border-white/10 relative z-10">
@@ -88,27 +114,12 @@ export default function ProfilePage() {
                 </Button>
               </Link>
               <div className="flex items-center gap-3">
-                <Icon3D shape="sphere" color="purple" size="sm" icon={Activity} />
+                <Icon3D shape="sphere" color="purple" size="sm" />
                 <div>
                   <h1 className="text-2xl font-bold text-white">Profile</h1>
                   <p className="text-sm text-text-secondary">Manage your personal information</p>
                 </div>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant={isEditing ? "default" : "outline"}
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-                className={
-                  isEditing
-                    ? "gradient-primary"
-                    : "glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
-                }
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                {isEditing ? "Save Changes" : "Edit Profile"}
-              </Button>
             </div>
           </div>
         </div>
@@ -123,24 +134,20 @@ export default function ProfilePage() {
                   <Avatar className="h-24 w-24 ring-4 ring-purple-500/30">
                     <AvatarImage src="/professional-woman-smiling.png" />
                     <AvatarFallback className="bg-gradient-to-br from-purple-500 to-blue-500 text-white text-lg">
-                      SJ
+                      {firstName.charAt(0)}
+                      {lastName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
-                  {isEditing && (
-                    <Button size="sm" className="absolute -bottom-2 -right-2 rounded-full h-8 w-8 p-0 gradient-primary">
-                      <Camera className="h-4 w-4" />
-                    </Button>
-                  )}
                 </div>
                 <div className="flex-1 text-center md:text-left">
                   <h2 className="text-2xl font-bold text-white">
-                    {profile.firstName} {profile.lastName}
+                    {firstName} {lastName}
                   </h2>
                   <p className="text-text-secondary flex items-center justify-center md:justify-start gap-1 mt-1">
                     <MapPin className="h-4 w-4" />
-                    {profile.location}
+                    {location || "Location not set"}
                   </p>
-                  <p className="text-text-primary mt-2">{profile.bio}</p>
+                  <p className="text-text-primary mt-2">{bio}</p>
                   <div className="flex flex-wrap gap-2 mt-3 justify-center md:justify-start">
                     <Badge className="bg-accent-purple/20 text-accent-purple border-accent-purple/30">
                       Type 2 Diabetes
@@ -148,165 +155,33 @@ export default function ProfilePage() {
                     <Badge className="bg-accent-green/20 text-accent-green border-accent-green/30">
                       Weight Management
                     </Badge>
-                    <Badge className="bg-accent-blue/20 text-accent-blue border-accent-blue/30">
-                      Coach: Dr. Emily Chen
-                    </Badge>
+                    <Badge className="bg-accent-blue/20 text-accent-blue border-accent-blue/30">Health Novice</Badge>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Icon3D shape="cube" color="blue" size="sm" icon={Edit} />
-                Personal Information
-              </CardTitle>
-              <CardDescription className="text-text-secondary">
-                Your basic personal details and contact information
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName" className="text-white">
-                    First Name
-                  </Label>
-                  <Input
-                    id="firstName"
-                    value={profile.firstName}
-                    disabled={!isEditing}
-                    onChange={(e) => setProfile((prev) => ({ ...prev, firstName: e.target.value }))}
-                    className="glass-input border-white/20 text-white placeholder:text-text-secondary"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lastName" className="text-white">
-                    Last Name
-                  </Label>
-                  <Input
-                    id="lastName"
-                    value={profile.lastName}
-                    disabled={!isEditing}
-                    onChange={(e) => setProfile((prev) => ({ ...prev, lastName: e.target.value }))}
-                    className="glass-input border-white/20 text-white placeholder:text-text-secondary"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="email" className="text-white">
-                    Email
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-text-secondary" />
-                    <Input
-                      id="email"
-                      value={profile.email}
-                      disabled={!isEditing}
-                      className="pl-10 glass-input border-white/20 text-white placeholder:text-text-secondary"
-                      onChange={(e) => setProfile((prev) => ({ ...prev, email: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="phone" className="text-white">
-                    Phone
-                  </Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-text-secondary" />
-                    <Input
-                      id="phone"
-                      value={profile.phone}
-                      disabled={!isEditing}
-                      className="pl-10 glass-input border-white/20 text-white placeholder:text-text-secondary"
-                      onChange={(e) => setProfile((prev) => ({ ...prev, phone: e.target.value }))}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="dateOfBirth" className="text-white">
-                    Date of Birth
-                  </Label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-text-secondary" />
-                    <Input
-                      id="dateOfBirth"
-                      type="date"
-                      value={profile.dateOfBirth}
-                      disabled={!isEditing}
-                      className="pl-10 glass-input border-white/20 text-white placeholder:text-text-secondary"
-                      onChange={(e) => setProfile((prev) => ({ ...prev, dateOfBirth: e.target.value }))}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="gender" className="text-white">
-                    Gender
-                  </Label>
-                  <Select value={profile.gender} disabled={!isEditing}>
-                    <SelectTrigger className="glass-input border-white/20 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="glass-card border-white/20">
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="height" className="text-white">
-                    Height (cm)
-                  </Label>
-                  <Input
-                    id="height"
-                    value={profile.height}
-                    disabled={!isEditing}
-                    onChange={(e) => setProfile((prev) => ({ ...prev, height: e.target.value }))}
-                    className="glass-input border-white/20 text-white placeholder:text-text-secondary"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="bio" className="text-white">
-                  Bio
-                </Label>
-                <Textarea
-                  id="bio"
-                  value={profile.bio}
-                  disabled={!isEditing}
-                  rows={3}
-                  onChange={(e) => setProfile((prev) => ({ ...prev, bio: e.target.value }))}
-                  className="glass-input border-white/20 text-white placeholder:text-text-secondary"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="emergencyContact" className="text-white">
-                  Emergency Contact
-                </Label>
-                <Input
-                  id="emergencyContact"
-                  value={profile.emergencyContact}
-                  disabled={!isEditing}
-                  onChange={(e) => setProfile((prev) => ({ ...prev, emergencyContact: e.target.value }))}
-                  className="glass-input border-white/20 text-white placeholder:text-text-secondary"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <ProfileEditForm
+            user={user}
+            profile={{
+              firstName,
+              lastName,
+              email,
+              phone,
+              dateOfBirth,
+              gender,
+              height,
+              location,
+              bio,
+              emergencyContact,
+            }}
+          />
 
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Icon3D shape="heart" color="green" size="sm" icon={Activity} />
+                <Icon3D shape="heart" color="green" size="sm" />
                 Health Overview
               </CardTitle>
               <CardDescription className="text-text-secondary">
@@ -316,31 +191,50 @@ export default function ProfilePage() {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center p-4 glass-card border-accent-blue/30 bg-gradient-to-br from-accent-blue/10 to-accent-blue/5 rounded-lg">
-                  <div className="text-2xl font-bold text-accent-blue">{healthStats.currentWeight}kg</div>
+                  <div className="text-2xl font-bold text-accent-blue">
+                    {healthStats.currentWeight > 0 ? `${healthStats.currentWeight}kg` : "Not set"}
+                  </div>
                   <div className="text-sm text-text-secondary">Current Weight</div>
-                  <Progress value={75} className="mt-2" />
-                  <div className="text-xs text-text-secondary mt-1">Target: {healthStats.targetWeight}kg</div>
+                  {healthStats.currentWeight > 0 && (
+                    <>
+                      <Progress value={75} className="mt-2" />
+                      <div className="text-xs text-text-secondary mt-1">Target: {healthStats.targetWeight}kg</div>
+                    </>
+                  )}
                 </div>
                 <div className="text-center p-4 glass-card border-accent-green/30 bg-gradient-to-br from-accent-green/10 to-accent-green/5 rounded-lg">
-                  <div className="text-2xl font-bold text-accent-green">{healthStats.avgGlucose}</div>
-                  <div className="text-sm text-text-secondary">Avg Glucose (mg/dL)</div>
-                  <Progress value={60} className="mt-2" />
-                  <div className="text-xs text-text-secondary mt-1">Target: {healthStats.targetGlucose}</div>
+                  <div className="text-2xl font-bold text-accent-green">
+                    {healthStats.avgGlucose > 0 ? healthStats.avgGlucose : "Not set"}
+                  </div>
+                  <div className="text-sm text-text-secondary">Latest Glucose (mg/dL)</div>
+                  {healthStats.avgGlucose > 0 && (
+                    <>
+                      <Progress value={60} className="mt-2" />
+                      <div className="text-xs text-text-secondary mt-1">Target: {healthStats.targetGlucose}</div>
+                    </>
+                  )}
                 </div>
                 <div className="text-center p-4 glass-card border-accent-orange/30 bg-gradient-to-br from-accent-orange/10 to-accent-orange/5 rounded-lg">
-                  <div className="text-2xl font-bold text-accent-orange">{healthStats.hba1c}%</div>
+                  <div className="text-2xl font-bold text-accent-orange">
+                    {healthStats.hba1c > 0 ? `${healthStats.hba1c}%` : "Not set"}
+                  </div>
                   <div className="text-sm text-text-secondary">HbA1c</div>
-                  <Progress value={45} className="mt-2" />
-                  <div className="text-xs text-text-secondary mt-1">Target: {healthStats.targetHba1c}%</div>
+                  {healthStats.hba1c > 0 && (
+                    <>
+                      <Progress value={45} className="mt-2" />
+                      <div className="text-xs text-text-secondary mt-1">Target: {healthStats.targetHba1c}%</div>
+                    </>
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
 
+          {/* ... existing achievements and quick actions cards remain the same ... */}
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Icon3D shape="torus" color="purple" size="sm" icon={Award} />
+                <Icon3D shape="torus" color="purple" size="sm" />
                 Achievements
               </CardTitle>
               <CardDescription className="text-text-secondary">
@@ -359,12 +253,7 @@ export default function ProfilePage() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon3D
-                        shape={achievement.shape as any}
-                        color={achievement.color as any}
-                        size="sm"
-                        icon={Award}
-                      />
+                      <Icon3D shape={achievement.shape as any} color={achievement.color as any} size="sm" />
                       <div className="flex-1">
                         <h4
                           className={`font-semibold ${achievement.earned ? "text-accent-green" : "text-text-secondary"}`}
@@ -386,7 +275,7 @@ export default function ProfilePage() {
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Icon3D shape="capsule" color="orange" size="sm" icon={Target} />
+                <Icon3D shape="capsule" color="orange" size="sm" />
                 Quick Actions
               </CardTitle>
             </CardHeader>
