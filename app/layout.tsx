@@ -4,12 +4,18 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import Particles from "@/components/Particles"
+import { ErrorBoundary } from "@/components/error-boundary"
+import { Toaster } from "@/components/ui/toaster"
+import { SkipNavigation } from "@/components/accessibility/skip-nav"
+import { LazyParticles } from "@/components/performance/lazy-particles"
 
 export const metadata: Metadata = {
   title: "MetaReverse - AI-Powered Health Management",
   description: "Medical-grade coaching for diabetes and obesity reversal",
   generator: "v0.app",
+  viewport: "width=device-width, initial-scale=1",
+  robots: "index, follow",
+  keywords: "diabetes management, health tracking, AI coaching, glucose monitoring",
 }
 
 export default function RootLayout({
@@ -20,6 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${GeistSans.className}`}>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//blob.vercel-storage.com" />
         <style>{`
 html {
   font-family: ${GeistSans.style.fontFamily};
@@ -29,6 +38,8 @@ html {
         `}</style>
       </head>
       <body className="relative min-h-screen text-foreground bg-mesh">
+        <SkipNavigation />
+
         <div
           aria-hidden
           className="pointer-events-none fixed inset-0 -z-10 opacity-60"
@@ -37,13 +48,17 @@ html {
           }}
         />
 
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
-          {/* Main app content */}
-          <div className="relative z-10">{children}</div>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
+            {/* Main app content */}
+            <main id="main-content" className="relative z-10">
+              {children}
+            </main>
+            <Toaster />
+          </ThemeProvider>
+        </ErrorBoundary>
 
-        <canvas id="particles-canvas" className="fixed inset-0 -z-5" />
-        <Particles selector="#particles-canvas" count={20} />
+        <LazyParticles />
       </body>
     </html>
   )
