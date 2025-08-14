@@ -316,7 +316,7 @@ export default async function DashboardPage() {
                   Beautiful! You're in your target range
                 </div>
               ) : (
-                <div className="text-sm text-gray-600">Your glucose meter is ready when you are</div>
+                <div className="text-sm text-slate-2000 meter is ready when you are</div>
               )}
               <div className="flex items-center mt-3 text-xs text-accent-blue">
                 <Icon3D shape="sphere" color="blue" size="sm" className="mr-2" />
@@ -340,7 +340,7 @@ export default async function DashboardPage() {
                   You're building awareness - that's what matters
                 </div>
               ) : (
-                <div className="text-sm text-gray-600">Not judgment, just building awareness</div>
+                <div className="text-sm text-slate-20000">Not judgment, just building awareness</div>
               )}
               <div className="flex items-center mt-3 text-xs text-accent-green">
                 <Icon3D shape="scale" color="green" size="sm" className="mr-2" />
