@@ -144,7 +144,7 @@ body {
   }
 
   h1 {
-    @apply text-4xl font-bold tracking-[-0.015em] text-white;
+    @apply text-4xl font-bold tracking-tight text-white;
   }
   h2 {
     @apply text-3xl font-semibold text-white;
