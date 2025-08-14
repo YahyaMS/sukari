@@ -308,15 +308,15 @@ export default async function DashboardPage() {
               {currentGlucose > 140 ? (
                 <div className="flex items-center text-sm text-orange-600">
                   <TrendingUp className="h-4 w-4 mr-1" />
-                  That's higher than usual - let's figure out what happened
+                  {"That's higher than usual - let's figure out what happened"}
                 </div>
               ) : currentGlucose > 0 ? (
                 <div className="flex items-center text-sm text-green-600">
                   <TrendingDown className="h-4 w-4 mr-1" />
-                  Beautiful! You're in your target range
+                  {"Beautiful! You're in your target range"}
                 </div>
               ) : (
-                <div className="text-sm text-slate-2000 meter is ready when you are</div>
+                <div className="text-sm text-text-secondary">{"Your meter is ready when you are"}</div>
               )}
               <div className="flex items-center mt-3 text-xs text-accent-blue">
                 <Icon3D shape="sphere" color="blue" size="sm" className="mr-2" />
@@ -337,10 +337,10 @@ export default async function DashboardPage() {
               {currentWeight > 0 ? (
                 <div className="flex items-center text-sm text-green-600">
                   <TrendingDown className="h-4 w-4 mr-1" />
-                  You're building awareness - that's what matters
+                  {"You're building awareness - that's what matters"}
                 </div>
               ) : (
-                <div className="text-sm text-slate-20000">Not judgment, just building awareness</div>
+                <div className="text-sm text-text-secondary">{"Not judgment, just building awareness"}</div>
               )}
               <div className="flex items-center mt-3 text-xs text-accent-green">
                 <Icon3D shape="scale" color="green" size="sm" className="mr-2" />
