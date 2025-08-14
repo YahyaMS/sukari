@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardDescription, CardHeader, CardTitle, ElevatedCard } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ArrowLeft, Activity } from "lucide-react"
+import { Icon3D } from "@/components/ui/3d-icon"
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { GamificationService } from "@/lib/gamification"
@@ -109,56 +110,61 @@ export default function GlucoseTrackingPage() {
   }
 
   const getGlucoseStatus = (value: number) => {
-    if (value < 70) return { status: "Low", color: "text-red-600", bg: "bg-red-50" }
-    if (value <= 140) return { status: "Normal", color: "text-green-600", bg: "bg-green-50" }
-    if (value <= 180) return { status: "High", color: "text-orange-600", bg: "bg-orange-50" }
-    return { status: "Very High", color: "text-red-600", bg: "bg-red-50" }
+    if (value < 70) return { status: "Low", color: "text-red-400", bg: "bg-red-500/20" }
+    if (value <= 140) return { status: "Normal", color: "text-green-400", bg: "bg-green-500/20" }
+    if (value <= 180) return { status: "High", color: "text-orange-400", bg: "bg-orange-500/20" }
+    return { status: "Very High", color: "text-red-400", bg: "bg-red-500/20" }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen">
+      <header className="glass-card border-b border-white/10 sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4" />
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <div className="flex items-center space-x-2">
-              <Activity className="h-6 w-6 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Glucose Tracking</h1>
+            <div className="flex items-center space-x-3">
+              <Icon3D shape="sphere" color="blue" size="lg" glow />
+              <h1 className="text-2xl font-bold text-text-primary">Glucose Tracking</h1>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-6 py-8">
         <div className="grid lg:grid-cols-2 gap-8">
-          {/* Glucose Entry Form */}
-          <Card>
+          <ElevatedCard className="animate-fade-in-up">
             <CardHeader>
-              <CardTitle>Log Glucose Reading</CardTitle>
-              <CardDescription>Enter your current blood glucose measurement</CardDescription>
+              <CardTitle className="flex items-center gap-3 text-text-primary">
+                <Icon3D shape="sphere" color="blue" size="md" />
+                Log Glucose Reading
+              </CardTitle>
+              <CardDescription className="text-text-secondary">
+                Enter your current blood glucose measurement
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="glucose">Glucose Level (mg/dL)</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="glucose" className="text-text-secondary font-medium">
+                    Glucose Level (mg/dL)
+                  </Label>
                   <Input
                     id="glucose"
                     type="number"
                     placeholder="Enter glucose value"
                     value={glucoseValue}
                     onChange={(e) => setGlucoseValue(e.target.value)}
-                    className="text-2xl font-bold text-center h-16"
+                    className="text-3xl font-bold text-center h-20 glass-card border-white/20 text-text-primary placeholder:text-text-muted"
                     required
                   />
                   {glucoseValue && (
                     <div className="text-center">
                       <Badge
-                        className={`${getGlucoseStatus(Number(glucoseValue)).bg} ${getGlucoseStatus(Number(glucoseValue)).color} border-0`}
+                        className={`${getGlucoseStatus(Number(glucoseValue)).bg} ${getGlucoseStatus(Number(glucoseValue)).color} border-0 px-4 py-2 text-sm font-semibold`}
                       >
                         {getGlucoseStatus(Number(glucoseValue)).status}
                       </Badge>
@@ -166,13 +172,15 @@ export default function GlucoseTrackingPage() {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="category">Reading Category</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="category" className="text-text-secondary font-medium">
+                    Reading Category
+                  </Label>
                   <Select value={category} onValueChange={setCategory} required>
-                    <SelectTrigger>
+                    <SelectTrigger className="glass-card border-white/20 text-text-primary">
                       <SelectValue placeholder="Select when you took this reading" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="glass-card border-white/20">
                       <SelectItem value="fasting">Fasting (8+ hours)</SelectItem>
                       <SelectItem value="pre-meal">Before Meal</SelectItem>
                       <SelectItem value="post-meal">After Meal (2 hours)</SelectItem>
@@ -182,11 +190,11 @@ export default function GlucoseTrackingPage() {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Symptoms (if any)</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-3">
+                  <Label className="text-text-secondary font-medium">Symptoms (if any)</Label>
+                  <div className="grid grid-cols-2 gap-3">
                     {symptoms.map((symptom) => (
-                      <div key={symptom} className="flex items-center space-x-2">
+                      <div key={symptom} className="flex items-center space-x-3 glass-card p-3 rounded-xl">
                         <Checkbox
                           id={symptom}
                           checked={selectedSymptoms.includes(symptom)}
@@ -197,8 +205,9 @@ export default function GlucoseTrackingPage() {
                               setSelectedSymptoms(selectedSymptoms.filter((s) => s !== symptom))
                             }
                           }}
+                          className="border-white/30"
                         />
-                        <Label htmlFor={symptom} className="text-sm">
+                        <Label htmlFor={symptom} className="text-sm text-text-secondary">
                           {symptom}
                         </Label>
                       </div>
@@ -206,71 +215,96 @@ export default function GlucoseTrackingPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Notes (optional)</Label>
+                <div className="space-y-3">
+                  <Label htmlFor="notes" className="text-text-secondary font-medium">
+                    Notes (optional)
+                  </Label>
                   <Textarea
                     id="notes"
                     placeholder="Any additional notes about this reading..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
+                    className="glass-card border-white/20 text-text-primary placeholder:text-text-muted"
                   />
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                   {isLoading ? "Saving..." : "Save Reading"}
+                  <Icon3D shape="sphere" color="white" size="sm" className="ml-2" />
                 </Button>
               </form>
             </CardContent>
-          </Card>
+          </ElevatedCard>
 
-          {/* Today's Trend */}
           <div className="space-y-6">
-            <Card>
+            <ElevatedCard className="animate-fade-in-up">
               <CardHeader>
-                <CardTitle>Today's Glucose Trend</CardTitle>
-                <CardDescription>Your glucose readings throughout the day</CardDescription>
+                <CardTitle className="flex items-center gap-3 text-text-primary">
+                  <Icon3D shape="cube" color="blue" size="md" />
+                  Today's Glucose Trend
+                </CardTitle>
+                <CardDescription className="text-text-secondary">
+                  Your glucose readings throughout the day
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={mockGlucoseData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="time" />
-                      <YAxis domain={[60, 200]} />
-                      <Tooltip />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                      <XAxis dataKey="time" stroke="#94A3B8" />
+                      <YAxis domain={[60, 200]} stroke="#94A3B8" />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.12)",
+                          borderRadius: "12px",
+                          backdropFilter: "blur(12px)",
+                          color: "#FFFFFF",
+                        }}
+                      />
                       <Line
                         type="monotone"
                         dataKey="value"
-                        stroke="#2563eb"
-                        strokeWidth={2}
-                        dot={{ fill: "#2563eb", strokeWidth: 2, r: 4 }}
+                        stroke="#3B82F6"
+                        strokeWidth={3}
+                        dot={{ fill: "#3B82F6", strokeWidth: 2, r: 6 }}
+                        activeDot={{ r: 8, fill: "#8B5CF6" }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
-            </Card>
+            </ElevatedCard>
 
-            <Card>
+            <ElevatedCard className="animate-fade-in-up">
               <CardHeader>
-                <CardTitle>Recent Readings</CardTitle>
-                <CardDescription>Your last few glucose measurements</CardDescription>
+                <CardTitle className="flex items-center gap-3 text-text-primary">
+                  <Icon3D shape="torus" color="green" size="md" />
+                  Recent Readings
+                </CardTitle>
+                <CardDescription className="text-text-secondary">Your last few glucose measurements</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
                 {mockGlucoseData
                   .slice(-4)
                   .reverse()
                   .map((reading, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="font-medium">{reading.time}</p>
-                        <p className="text-sm text-gray-600 capitalize">{reading.category.replace("-", " ")}</p>
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-4 glass-card rounded-xl hover-lift transition-smooth"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon3D shape="sphere" color="blue" size="sm" />
+                        <div>
+                          <p className="font-semibold text-text-primary">{reading.time}</p>
+                          <p className="text-sm text-text-secondary capitalize">{reading.category.replace("-", " ")}</p>
+                        </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-lg">{reading.value} mg/dL</p>
+                        <p className="font-bold text-xl text-text-primary">{reading.value} mg/dL</p>
                         <Badge
-                          variant="secondary"
-                          className={`${getGlucoseStatus(reading.value).bg} ${getGlucoseStatus(reading.value).color} border-0`}
+                          className={`${getGlucoseStatus(reading.value).bg} ${getGlucoseStatus(reading.value).color} border-0 mt-1`}
                         >
                           {getGlucoseStatus(reading.value).status}
                         </Badge>
@@ -278,7 +312,7 @@ export default function GlucoseTrackingPage() {
                     </div>
                   ))}
               </CardContent>
-            </Card>
+            </ElevatedCard>
           </div>
         </div>
       </main>
