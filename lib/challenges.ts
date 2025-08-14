@@ -1,5 +1,4 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "./supabase/client"
 
 export interface Challenge {
   id: string
@@ -55,66 +54,80 @@ export class ChallengeService {
   private supabase
 
   constructor() {
-    this.supabase = createServerComponentClient({ cookies })
+    this.supabase = createClient()
+  }
+
+  private isTableNotFoundError(error: any): boolean {
+    return (
+      error?.code === "PGRST116" || error?.message?.includes("relation") || error?.message?.includes("does not exist")
+    )
   }
 
   async getActiveChallenges(userId?: string): Promise<Challenge[]> {
-    const query = this.supabase
-      .from("challenges")
-      .select(`
-        *,
-        challenge_participants!left(count)
-      `)
-      .eq("is_active", true)
-      .eq("is_public", true)
-      .gte("end_date", new Date().toISOString())
+    try {
+      const query = this.supabase
+        .from("challenges")
+        .select(`
+          *,
+          challenge_participants!left(count)
+        `)
+        .eq("is_active", true)
+        .eq("is_public", true)
+        .gte("end_date", new Date().toISOString())
 
-    const { data, error } = await query
+      const { data, error } = await query
 
-    if (error) {
-      console.error("Error fetching challenges:", error)
+      if (error) {
+        if (this.isTableNotFoundError(error)) {
+          return []
+        }
+        console.error("Error fetching challenges:", error)
+        return []
+      }
+
+      const challenges = await Promise.all(
+        (data || []).map(async (challenge) => {
+          const participantCount = challenge.challenge_participants?.[0]?.count || 0
+
+          let userParticipating = false
+          let userRank = null
+          let userScore = null
+
+          if (userId) {
+            const { data: participation } = await this.supabase
+              .from("challenge_participants")
+              .select("rank, current_score")
+              .eq("challenge_id", challenge.id)
+              .eq("user_id", userId)
+              .single()
+
+            if (participation) {
+              userParticipating = true
+              userRank = participation.rank
+              userScore = participation.current_score
+            }
+          }
+
+          const daysRemaining = Math.ceil(
+            (new Date(challenge.end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
+          )
+
+          return {
+            ...challenge,
+            participant_count: participantCount,
+            user_participating: userParticipating,
+            user_rank: userRank,
+            user_score: userScore,
+            days_remaining: Math.max(0, daysRemaining),
+          }
+        }),
+      )
+
+      return challenges
+    } catch (error) {
+      console.error("Error in getActiveChallenges:", error)
       return []
     }
-
-    const challenges = await Promise.all(
-      (data || []).map(async (challenge) => {
-        const participantCount = challenge.challenge_participants?.[0]?.count || 0
-
-        let userParticipating = false
-        let userRank = null
-        let userScore = null
-
-        if (userId) {
-          const { data: participation } = await this.supabase
-            .from("challenge_participants")
-            .select("rank, current_score")
-            .eq("challenge_id", challenge.id)
-            .eq("user_id", userId)
-            .single()
-
-          if (participation) {
-            userParticipating = true
-            userRank = participation.rank
-            userScore = participation.current_score
-          }
-        }
-
-        const daysRemaining = Math.ceil(
-          (new Date(challenge.end_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
-        )
-
-        return {
-          ...challenge,
-          participant_count: participantCount,
-          user_participating: userParticipating,
-          user_rank: userRank,
-          user_score: userScore,
-          days_remaining: Math.max(0, daysRemaining),
-        }
-      }),
-    )
-
-    return challenges
   }
 
   async getChallengeById(challengeId: string, userId?: string): Promise<Challenge | null> {

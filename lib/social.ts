@@ -1,5 +1,4 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "./supabase/client"
 
 export interface Friend {
   id: string
@@ -69,14 +68,12 @@ export class SocialService {
   private supabase
 
   constructor() {
-    this.supabase = createServerComponentClient({ cookies })
+    this.supabase = createClient()
   }
 
   private isTableNotFoundError(error: any): boolean {
     return (
-      error?.message?.includes("schema cache") ||
-      error?.message?.includes("does not exist") ||
-      (error?.message?.includes("table") && error?.message?.includes("not found"))
+      error?.code === "PGRST116" || error?.message?.includes("relation") || error?.message?.includes("does not exist")
     )
   }
 

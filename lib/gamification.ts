@@ -1,5 +1,4 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { createClient } from "./supabase/client"
 
 export interface UserGamification {
   id: string
@@ -74,7 +73,13 @@ export class GamificationService {
   private supabase
 
   constructor() {
-    this.supabase = createServerComponentClient({ cookies })
+    this.supabase = createClient()
+  }
+
+  private isTableNotFoundError(error: any): boolean {
+    return (
+      error?.code === "PGRST116" || error?.message?.includes("relation") || error?.message?.includes("does not exist")
+    )
   }
 
   async getUserGamification(userId: string): Promise<UserGamification | null> {
@@ -82,10 +87,7 @@ export class GamificationService {
       const { data, error } = await this.supabase.from("user_gamification").select("*").eq("user_id", userId).single()
 
       if (error) {
-        if (
-          error.message.includes("table") &&
-          (error.message.includes("does not exist") || error.message.includes("schema cache"))
-        ) {
+        if (this.isTableNotFoundError(error)) {
           console.warn("Gamification tables not yet created, returning default values")
           return null
         }
@@ -109,10 +111,7 @@ export class GamificationService {
         .eq("is_active", true)
 
       if (error) {
-        if (
-          error.message.includes("table") &&
-          (error.message.includes("does not exist") || error.message.includes("schema cache"))
-        ) {
+        if (this.isTableNotFoundError(error)) {
           console.warn("Streaks table not yet created, returning empty array")
           return []
         }
@@ -145,10 +144,7 @@ export class GamificationService {
         .eq("user_id", userId)
 
       if (error) {
-        if (
-          error.message.includes("table") &&
-          (error.message.includes("does not exist") || error.message.includes("schema cache"))
-        ) {
+        if (this.isTableNotFoundError(error)) {
           console.warn("Achievements tables not yet created, returning empty array")
           return []
         }
@@ -187,10 +183,7 @@ export class GamificationService {
         .limit(limit)
 
       if (error) {
-        if (
-          error.message.includes("table") &&
-          (error.message.includes("does not exist") || error.message.includes("schema cache"))
-        ) {
+        if (this.isTableNotFoundError(error)) {
           console.warn("HP activities table not yet created, returning empty array")
           return []
         }
@@ -245,7 +238,7 @@ export class GamificationService {
       // Check if tables exist
       const { error: testError } = await this.supabase.from("user_gamification").select("id").limit(1)
 
-      if (testError && (testError.message.includes("does not exist") || testError.message.includes("schema cache"))) {
+      if (testError && this.isTableNotFoundError(testError)) {
         console.warn("Gamification tables don't exist yet, HP awarding skipped")
         return false
       }
@@ -357,7 +350,7 @@ export class GamificationService {
     try {
       const { error: testError } = await this.supabase.from("user_gamification").select("id").limit(1)
 
-      if (testError && (testError.message.includes("does not exist") || testError.message.includes("schema cache"))) {
+      if (testError && this.isTableNotFoundError(testError)) {
         console.warn("Gamification tables don't exist yet, skipping initialization")
         return false
       }
