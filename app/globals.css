@@ -244,9 +244,23 @@ body {
     transform: translateY(-1px);
   }
 
-  /* Gradient-border utility (paired with plugin) */
-  .ring-gradient {
-    @apply gradient-border;
+  /* Gradient-border utility class */
+  .gradient-border {
+    position: relative;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-xl);
+  }
+  .gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.6), rgba(59, 130, 246, 0.4), rgba(16, 185, 129, 0.3));
+    border-radius: inherit;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
   }
 
   /* Skeletons */
