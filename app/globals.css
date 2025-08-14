@@ -171,21 +171,59 @@
   }
 
   body {
-    /* Applied modern dark background with gradient */
+    /* Enhanced body styling with animated background and floating elements */
     background: var(--gradient-background);
     color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    position: relative;
+    overflow-x: hidden;
   }
 
-  /* Added glassmorphism utility classes */
+  /* Added floating background elements for all pages */
+  body::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Added page container class for consistent layout */
+  .page-container {
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+
+  .content-wrapper {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Enhanced glassmorphism utility classes */
   .glass-card {
     background: var(--surface-secondary);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 1.25rem;
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    background: var(--surface-elevated);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
   }
 
   .glass-elevated {
@@ -194,6 +232,59 @@
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 1.25rem;
     box-shadow: var(--shadow-medium);
+  }
+
+  /* Added gradient button classes */
+  .btn-gradient-purple {
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-gradient-purple:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-gradient-blue {
+    background: var(--gradient-secondary);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-gradient-blue:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  }
+
+  .btn-gradient-green {
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-secondary) 100%);
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-gradient-green:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+  }
+
+  .glass-button {
+    background: var(--surface-secondary);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+  }
+
+  .glass-button:hover {
+    background: var(--surface-elevated);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
   }
 
   .gradient-primary {
@@ -208,7 +299,7 @@
     box-shadow: var(--shadow-glow);
   }
 
-  /* Added smooth transitions for all interactive elements */
+  /* Enhanced animation classes */
   .transition-smooth {
     transition: all 0.2s ease;
   }
@@ -222,7 +313,20 @@
     box-shadow: var(--shadow-glow);
   }
 
-  /* Added animation keyframes */
+  /* Added comprehensive animation keyframes */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    33% {
+      transform: translateY(-30px) rotate(120deg);
+    }
+    66% {
+      transform: translateY(-20px) rotate(240deg);
+    }
+  }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -231,6 +335,28 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 
@@ -244,11 +370,50 @@
     }
   }
 
+  @keyframes glow {
+    0%,
+    100% {
+      box-shadow: 0 0 5px rgba(139, 92, 246, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+    }
+  }
+
   .animate-fade-in-up {
     animation: fadeInUp 0.3s ease forwards;
   }
 
+  .animate-slide-in-left {
+    animation: slideInLeft 0.3s ease forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease forwards;
+  }
+
   .animate-pulse-soft {
     animation: pulse 2s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  /* Added staggered animation delays */
+  .animate-delay-100 {
+    animation-delay: 0.1s;
+  }
+
+  .animate-delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .animate-delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  .animate-delay-400 {
+    animation-delay: 0.4s;
   }
 }
