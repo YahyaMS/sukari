@@ -29,22 +29,21 @@ html {
         `}</style>
       </head>
       <body className="relative min-h-screen text-foreground bg-mesh">
-        {/* Atmospheric glow layers */}
         <div
           aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10"
+          className="pointer-events-none fixed inset-0 -z-10 opacity-60"
           style={{
-            background: "radial-gradient(40rem 30rem at 70% 20%, rgba(139,92,246,.22), transparent 70%)",
+            background: "radial-gradient(50rem 40rem at 60% 30%, rgba(139,92,246,.15), transparent 70%)",
           }}
         />
-        <canvas id="particles-canvas" />
 
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange={false}>
           {/* Main app content */}
           <div className="relative z-10">{children}</div>
         </ThemeProvider>
 
-        <Particles selector="#particles-canvas" />
+        <canvas id="particles-canvas" className="fixed inset-0 -z-5" />
+        <Particles selector="#particles-canvas" count={20} />
       </body>
     </html>
   )

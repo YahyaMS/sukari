@@ -1,10 +1,19 @@
 "use client"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 type Props = { selector?: string; count?: number }
 
-export default function Particles({ selector = "#particles-canvas", count = 80 }: Props) {
+export default function Particles({ selector = "#particles-canvas", count = 25 }: Props) {
+  const [isVisible, setIsVisible] = useState(false)
+
   useEffect(() => {
+    const timer = setTimeout(() => setIsVisible(true), 1000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    if (!isVisible) return
+
     const canvas = document.querySelector(selector) as HTMLCanvasElement | null
     if (!canvas) return
     const ctx = canvas.getContext("2d")!
@@ -20,9 +29,9 @@ export default function Particles({ selector = "#particles-canvas", count = 80 }
     const particles = Array.from({ length: count }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      r: Math.random() * 1.6 + 0.6,
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: (Math.random() - 0.5) * 0.2,
+      r: Math.random() * 1.2 + 0.4,
     }))
 
     let mouseX = width / 2
@@ -34,14 +43,18 @@ export default function Particles({ selector = "#particles-canvas", count = 80 }
     window.addEventListener("mousemove", onMouse)
 
     let raf = 0
+    let frameCount = 0
     const draw = () => {
+      frameCount++
       ctx.clearRect(0, 0, width, height)
-      // background soft glow
-      const grd = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 240)
-      grd.addColorStop(0, "rgba(139,92,246,0.12)")
-      grd.addColorStop(1, "rgba(0,0,0,0)")
-      ctx.fillStyle = grd
-      ctx.fillRect(0, 0, width, height)
+
+      if (frameCount % 3 === 0) {
+        const grd = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 200)
+        grd.addColorStop(0, "rgba(139,92,246,0.08)")
+        grd.addColorStop(1, "rgba(0,0,0,0)")
+        ctx.fillStyle = grd
+        ctx.fillRect(0, 0, width, height)
+      }
 
       // particles
       for (const p of particles) {
@@ -54,30 +67,20 @@ export default function Particles({ selector = "#particles-canvas", count = 80 }
         if (p.y < 0) p.y = height
         if (p.y > height) p.y = 0
 
-        // slight mouse attraction
-        const dx = mouseX - p.x,
-          dy = mouseY - p.y
-        const dist = Math.hypot(dx, dy)
-        const force = Math.max(0, 120 - dist) / 1200
-        p.vx += dx * force * 0.002
-        p.vy += dy * force * 0.002
-
-        // color varies
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(139,92,246,${0.35 + Math.random() * 0.15})`
+        ctx.fillStyle = `rgba(139,92,246,${0.25 + Math.random() * 0.1})`
         ctx.fill()
       }
 
-      // linking lines
-      ctx.strokeStyle = "rgba(59,130,246,0.10)"
+      ctx.strokeStyle = "rgba(59,130,246,0.06)"
       for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
+        for (let j = i + 1; j < Math.min(i + 5, particles.length); j++) {
           const a = particles[i],
             b = particles[j]
           const d = Math.hypot(a.x - b.x, a.y - b.y)
-          if (d < 120) {
-            ctx.globalAlpha = 1 - d / 120
+          if (d < 80) {
+            ctx.globalAlpha = 1 - d / 80
             ctx.beginPath()
             ctx.moveTo(a.x, a.y)
             ctx.lineTo(b.x, b.y)
@@ -96,7 +99,7 @@ export default function Particles({ selector = "#particles-canvas", count = 80 }
       window.removeEventListener("resize", onResize)
       window.removeEventListener("mousemove", onMouse)
     }
-  }, [selector, count])
+  }, [selector, count, isVisible])
 
   return null
 }
