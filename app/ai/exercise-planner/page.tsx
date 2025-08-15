@@ -297,7 +297,7 @@ export default function ExercisePlannerPage() {
               </Button>
             </Link>
             <div className="flex items-center space-x-2">
-              <Icon3D type="cube" color="purple" size="sm" />
+              <Icon3D shape="cube" color="purple" size="sm" />
               <h1 className="text-2xl font-bold text-white">AI Exercise Planner</h1>
             </div>
           </div>
@@ -309,7 +309,7 @@ export default function ExercisePlannerPage() {
           <div className="space-y-6">
             <div className="glass-card p-6 ring-gradient animate-fade-in-up">
               <div className="flex items-center space-x-2 mb-2">
-                <Icon3D type="sphere" color="blue" size="sm" />
+                <Icon3D shape="sphere" color="blue" size="sm" />
                 <h2 className="text-xl font-bold text-white">Exercise Preferences</h2>
               </div>
               <p className="text-text-secondary mb-6">Customize your AI-generated workout plan</p>
@@ -410,12 +410,12 @@ export default function ExercisePlannerPage() {
                 <Button onClick={handleGeneratePlans} className="btn btn-primary w-full" disabled={isGenerating}>
                   {isGenerating ? (
                     <>
-                      <Icon3D type="sphere" color="purple" size="xs" className="mr-2 animate-pulse" />
+                      <Icon3D shape="sphere" color="purple" size="xs" className="mr-2 animate-pulse" />
                       Generating...
                     </>
                   ) : (
                     <>
-                      <Icon3D type="cube" color="white" size="xs" className="mr-2" />
+                      <Icon3D shape="cube" color="white" size="xs" className="mr-2" />
                       Generate AI Workout Plan
                     </>
                   )}
@@ -427,7 +427,7 @@ export default function ExercisePlannerPage() {
           <div className="lg:col-span-2">
             {generatedPlans.length === 0 ? (
               <div className="glass-card p-12 text-center ring-gradient animate-fade-in-up">
-                <Icon3D type="capsule" color="blue" size="lg" className="mx-auto mb-4" />
+                <Icon3D shape="capsule" color="blue" size="lg" className="mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-white mb-2">AI-Powered Exercise Planning</h3>
                 <p className="text-text-secondary mb-4">
                   Get personalized workout plans optimized for glucose control, based on your fitness level, available
