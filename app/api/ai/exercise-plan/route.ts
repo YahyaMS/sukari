@@ -1,9 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { generateText } from "ai"
 import { createOpenAI } from "@ai-sdk/openai"
+import { google } from "@ai-sdk/google"
 
 const deepseek = createOpenAI({
-  apiKey: "sk-672c9c6817334df590f21e0aa2d9fb0f",
+  apiKey: process.env.DEEPSEEK_API_KEY,
   baseURL: "https://api.deepseek.com/v1",
 })
 
@@ -50,8 +51,10 @@ export async function POST(request: NextRequest) {
     
     Focus on exercises that improve insulin sensitivity and glucose control. Include glucose impact estimates.`
 
+    const model = process.env.DEEPSEEK_API_KEY ? deepseek("deepseek-chat") : google("gemini-1.5-flash")
+
     const { text } = await generateText({
-      model: deepseek("deepseek-chat"),
+      model,
       prompt,
       temperature: 0.7,
     })

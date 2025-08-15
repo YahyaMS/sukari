@@ -1,8 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { generateText } from "ai"
+import { google } from "@ai-sdk/google"
+import { createOpenAI } from "@ai-sdk/openai"
 import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+
+const deepseek = createOpenAI({
+  apiKey: process.env.DEEPSEEK_API_KEY,
+  baseURL: "https://api.deepseek.com/v1",
+})
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,15 +51,10 @@ Guidelines:
 
 For medical questions, remind them to consult their healthcare provider while offering general support and encouragement.`
 
+    const model = process.env.DEEPSEEK_API_KEY ? deepseek("deepseek-chat") : google("gemini-1.5-flash")
+
     const { text } = await generateText({
-      model: process.env.DEEPSEEK_API_KEY
-        ? {
-            provider: "openai",
-            model: "deepseek-chat",
-            baseURL: "https://api.deepseek.com/v1",
-            apiKey: process.env.DEEPSEEK_API_KEY,
-          }
-        : undefined,
+      model,
       system: systemPrompt,
       prompt: message,
       maxTokens: 500,
