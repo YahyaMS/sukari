@@ -1,6 +1,4 @@
-import "server-only"
-import type { CookiesFn } from "./supabase-server"
-import { supabaseServer } from "./supabase-server"
+import { createClient } from "./supabase/client"
 
 export interface Friend {
   id: string
@@ -67,15 +65,7 @@ export interface PrivacySettings {
 }
 
 export class SocialService {
-  private cookiesFn: CookiesFn
-
-  constructor(cookiesFn: CookiesFn) {
-    this.cookiesFn = cookiesFn
-  }
-
-  private get supabase() {
-    return supabaseServer(this.cookiesFn)
-  }
+  private supabase = createClient()
 
   private isTableNotFoundError(error: any): boolean {
     return (
@@ -601,44 +591,36 @@ export class SocialService {
   }
 }
 
-export async function getFriends(cookiesFn: CookiesFn, userId: string): Promise<Friend[]> {
-  const service = new SocialService(cookiesFn)
+export async function getFriends(userId: string): Promise<Friend[]> {
+  const service = new SocialService()
   return service.getFriends(userId)
 }
 
-export async function getFriendRequests(cookiesFn: CookiesFn, userId: string): Promise<Friend[]> {
-  const service = new SocialService(cookiesFn)
+export async function getFriendRequests(userId: string): Promise<Friend[]> {
+  const service = new SocialService()
   return service.getFriendRequests(userId)
 }
 
-export async function getSocialFeed(cookiesFn: CookiesFn, userId: string, limit = 20): Promise<SocialPost[]> {
-  const service = new SocialService(cookiesFn)
+export async function getSocialFeed(userId: string, limit = 20): Promise<SocialPost[]> {
+  const service = new SocialService()
   return service.getSocialFeed(userId, limit)
 }
 
-export async function getFriendsLeaderboard(
-  cookiesFn: CookiesFn,
-  userId: string,
-  type = "health_points",
-): Promise<Friend[]> {
-  const service = new SocialService(cookiesFn)
+export async function getFriendsLeaderboard(userId: string, type = "health_points"): Promise<Friend[]> {
+  const service = new SocialService()
   return service.getFriendsLeaderboard(userId, type)
 }
 
-export async function sendFriendRequest(
-  cookiesFn: CookiesFn,
-  requesterId: string,
-  targetEmail: string,
-): Promise<boolean> {
-  const service = new SocialService(cookiesFn)
+export async function sendFriendRequest(requesterId: string, targetEmail: string): Promise<boolean> {
+  const service = new SocialService()
   return service.sendFriendRequest(requesterId, targetEmail)
 }
 
-export async function acceptFriendRequest(cookiesFn: CookiesFn, userId: string, requesterId: string): Promise<boolean> {
-  const service = new SocialService(cookiesFn)
+export async function acceptFriendRequest(userId: string, requesterId: string): Promise<boolean> {
+  const service = new SocialService()
   return service.acceptFriendRequest(userId, requesterId)
 }
 
-export async function getUserFriends(cookiesFn: CookiesFn, userId: string): Promise<Friend[]> {
-  return getFriends(cookiesFn, userId)
+export async function getUserFriends(userId: string): Promise<Friend[]> {
+  return getFriends(userId)
 }
