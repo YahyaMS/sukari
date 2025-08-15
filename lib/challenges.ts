@@ -1,4 +1,6 @@
-import { createClient } from "./supabase/client"
+import "server-only"
+import type { CookiesFn } from "./supabase-server"
+import { supabaseServer } from "./supabase-server"
 
 export interface Challenge {
   id: string
@@ -51,10 +53,14 @@ export interface ChallengeLeaderboard {
 }
 
 export class ChallengeService {
-  private supabase
+  private cookiesFn: CookiesFn
 
-  constructor() {
-    this.supabase = createClient()
+  constructor(cookiesFn: CookiesFn) {
+    this.cookiesFn = cookiesFn
+  }
+
+  private get supabase() {
+    return supabaseServer(this.cookiesFn)
   }
 
   private isTableNotFoundError(error: any): boolean {
@@ -327,4 +333,46 @@ export class ChallengeService {
 
     return metricCount > 0 ? totalProgress / metricCount : 0
   }
+}
+
+export async function getActiveChallenges(cookiesFn: CookiesFn, userId?: string): Promise<Challenge[]> {
+  const service = new ChallengeService(cookiesFn)
+  return service.getActiveChallenges(userId)
+}
+
+export async function getChallengeById(
+  cookiesFn: CookiesFn,
+  challengeId: string,
+  userId?: string,
+): Promise<Challenge | null> {
+  const service = new ChallengeService(cookiesFn)
+  return service.getChallengeById(challengeId, userId)
+}
+
+export async function joinChallenge(
+  cookiesFn: CookiesFn,
+  challengeId: string,
+  userId: string,
+  teamName?: string,
+): Promise<boolean> {
+  const service = new ChallengeService(cookiesFn)
+  return service.joinChallenge(challengeId, userId, teamName)
+}
+
+export async function getChallengeLeaderboard(
+  cookiesFn: CookiesFn,
+  challengeId: string,
+  limit = 50,
+): Promise<ChallengeLeaderboard[]> {
+  const service = new ChallengeService(cookiesFn)
+  return service.getChallengeLeaderboard(challengeId, limit)
+}
+
+export async function getUserChallenges(cookiesFn: CookiesFn, userId: string): Promise<Challenge[]> {
+  const service = new ChallengeService(cookiesFn)
+  return service.getUserChallenges(userId)
+}
+
+export async function getChallenges(cookiesFn: CookiesFn, userId?: string): Promise<Challenge[]> {
+  return getActiveChallenges(cookiesFn, userId)
 }

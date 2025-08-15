@@ -1,4 +1,6 @@
-import { createClient } from "./supabase/client"
+import "server-only"
+import type { CookiesFn } from "./supabase-server"
+import { supabaseServer } from "./supabase-server"
 
 export interface UserGamification {
   id: string
@@ -70,10 +72,14 @@ export const LEVEL_SYSTEM = [
 ]
 
 export class GamificationService {
-  private supabase
+  private cookiesFn: CookiesFn
 
-  constructor() {
-    this.supabase = createClient()
+  constructor(cookiesFn: CookiesFn) {
+    this.cookiesFn = cookiesFn
+  }
+
+  private get supabase() {
+    return supabaseServer(this.cookiesFn)
   }
 
   private isTableNotFoundError(error: any): boolean {
@@ -481,4 +487,43 @@ export class GamificationService {
         return "text-gray-500"
     }
   }
+}
+
+export async function getUserGamification(cookiesFn: CookiesFn, userId: string): Promise<UserGamification | null> {
+  const service = new GamificationService(cookiesFn)
+  return service.getUserGamification(userId)
+}
+
+export async function getUserStreaks(cookiesFn: CookiesFn, userId: string): Promise<Streak[]> {
+  const service = new GamificationService(cookiesFn)
+  return service.getUserStreaks(userId)
+}
+
+export async function getUserAchievements(cookiesFn: CookiesFn, userId: string): Promise<Achievement[]> {
+  const service = new GamificationService(cookiesFn)
+  return service.getUserAchievements(userId)
+}
+
+export async function getRecentHPActivities(cookiesFn: CookiesFn, userId: string, limit = 10): Promise<HPActivity[]> {
+  const service = new GamificationService(cookiesFn)
+  return service.getRecentHPActivities(userId, limit)
+}
+
+export async function awardHealthPoints(
+  cookiesFn: CookiesFn,
+  userId: string,
+  activityType: keyof typeof HP_REWARDS,
+  description?: string,
+  referenceId?: string,
+): Promise<boolean> {
+  const service = new GamificationService(cookiesFn)
+  return service.awardHealthPoints(userId, activityType, description, referenceId)
+}
+
+export async function getOrCreateUserGamification(
+  cookiesFn: CookiesFn,
+  userId: string,
+): Promise<UserGamification | null> {
+  const service = new GamificationService(cookiesFn)
+  return service.getOrCreateUserGamification(userId)
 }

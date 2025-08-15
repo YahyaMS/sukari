@@ -1,0 +1,32 @@
+import { NextResponse } from "next/server"
+import { cookies } from "next/headers"
+import { getUserFriends, getFriendRequests, getSocialFeed } from "@/lib/social"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+
+export async function GET() {
+  try {
+    const supabase = createServerComponentClient({ cookies })
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const [friends, friendRequests, socialFeed] = await Promise.all([
+      getUserFriends(cookies, user.id),
+      getFriendRequests(cookies, user.id),
+      getSocialFeed(cookies, user.id),
+    ])
+
+    return NextResponse.json({
+      friends,
+      friendRequests,
+      socialFeed,
+    })
+  } catch (error: any) {
+    console.error("API Error fetching social data:", error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
