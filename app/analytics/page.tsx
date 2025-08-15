@@ -88,7 +88,9 @@ export default function AnalyticsPage() {
         : 0
 
       const weightChange =
-        weightEntries?.length >= 2 ? weightEntries[weightEntries.length - 1].weight_kg - weightEntries[0].weight_kg : 0
+        weightEntries && weightEntries.length >= 2
+          ? weightEntries[weightEntries.length - 1].weight_kg - weightEntries[0].weight_kg
+          : 0
 
       const timeInRange = glucoseReadings?.length
         ? (glucoseReadings.filter((r) => r.value >= 70 && r.value <= 180).length / glucoseReadings.length) * 100
@@ -303,7 +305,7 @@ export default function AnalyticsPage() {
               </Card>
 
               <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardHeader>
                   <CardTitle className="text-sm font-medium text-white">Meals Logged</CardTitle>
                   <Icon3D shape="capsule" color="orange" size="sm" />
                 </CardHeader>
