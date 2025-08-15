@@ -410,12 +410,12 @@ export default function ExercisePlannerPage() {
                 <Button onClick={handleGeneratePlans} className="btn btn-primary w-full" disabled={isGenerating}>
                   {isGenerating ? (
                     <>
-                      <Icon3D shape="sphere" color="purple" size="xs" className="mr-2 animate-pulse" />
+                      <Icon3D shape="sphere" color="purple" size="sm" className="mr-2 animate-pulse" />
                       Generating...
                     </>
                   ) : (
                     <>
-                      <Icon3D shape="cube" color="white" size="xs" className="mr-2" />
+                      <Icon3D shape="cube" color="white" size="sm" className="mr-2" />
                       Generate AI Workout Plan
                     </>
                   )}
