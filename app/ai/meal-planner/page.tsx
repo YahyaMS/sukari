@@ -355,7 +355,7 @@ export default function MealPlannerPage() {
                     </>
                   ) : (
                     <>
-                      <Icon3D shape="sphere" color="purple" size="xs" className="mr-2" />
+                      <Icon3D shape="sphere" color="purple" size="sm" className="mr-2" />
                       Generate AI Meal Plan
                     </>
                   )}

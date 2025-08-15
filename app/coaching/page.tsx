@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { Icon3D } from "@/components/ui/3d-icon"
 import {
-  MessageCircle,
   Video,
   Calendar,
   Paperclip,
@@ -245,7 +244,7 @@ export default function CoachingPage() {
               </Button>
             </Link>
             <div className="flex items-center space-x-3">
-              <Icon3D shape="sphere" color="blue" size="sm" icon={MessageCircle} />
+              <Icon3D shape="sphere" color="blue" size="sm" />
               <h1 className="text-2xl font-bold text-white">My Coach</h1>
             </div>
           </div>
@@ -336,7 +335,7 @@ export default function CoachingPage() {
             <Card className="mt-6 glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-lg text-white flex items-center gap-2">
-                  <Icon3D shape="cube" color="green" size="sm" icon={Calendar} />
+                  <Icon3D shape="cube" color="green" size="sm" />
                   Quick Actions
                 </CardTitle>
               </CardHeader>

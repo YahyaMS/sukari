@@ -144,7 +144,7 @@ export default function InsightsPage() {
               </Button>
             </Link>
             <div className="flex items-center space-x-2">
-              <Icon3D type="cube" color="purple" size="sm" />
+              <Icon3D shape="cube" color="purple" size="sm" />
               <h1 className="text-2xl font-bold text-white">AI Health Insights</h1>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function InsightsPage() {
           <div className="lg:col-span-2 space-y-6">
             <div className="glass-card p-6 ring-gradient animate-fade-in-up">
               <div className="flex items-center space-x-2 mb-2">
-                <Icon3D type="sphere" color="yellow" size="sm" />
+                <Icon3D shape="sphere" color="orange" size="sm" />
                 <h2 className="text-xl font-bold text-white">Personalized Insights</h2>
               </div>
               <p className="text-text-secondary mb-6">AI-powered analysis of your health patterns and trends</p>
@@ -228,7 +228,7 @@ export default function InsightsPage() {
           <div className="space-y-6">
             <div className="glass-card p-6 ring-gradient animate-fade-in-up">
               <div className="flex items-center space-x-2 mb-2">
-                <Icon3D type="triangle" color="orange" size="sm" />
+                <Icon3D shape="cube" color="orange" size="sm" />
                 <h2 className="text-xl font-bold text-white">Risk Assessment</h2>
               </div>
               <p className="text-text-secondary mb-6">Current health risk factors and trends</p>

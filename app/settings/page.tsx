@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowLeft, Bell, Shield, User, Smartphone, Heart, HelpCircle, LogOut } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -40,7 +40,7 @@ export default function SettingsPage() {
                 </Button>
               </Link>
               <div className="flex items-center gap-3">
-                <Icon3D shape="cube" color="purple" size="sm" icon={User} />
+                <Icon3D shape="cube" color="purple" size="sm" />
                 <div>
                   <h1 className="text-2xl font-bold text-white">Settings</h1>
                   <p className="text-sm text-text-secondary">Manage your preferences and account</p>
@@ -48,7 +48,7 @@ export default function SettingsPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <Icon3D shape="heart" color="blue" size="sm" icon={Heart} />
+              <Icon3D shape="heart" color="blue" size="sm" />
               <span className="font-semibold text-white">MetaReverse</span>
             </div>
           </div>
@@ -60,7 +60,7 @@ export default function SettingsPage() {
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Icon3D shape="sphere" color="blue" size="sm" icon={User} />
+                <Icon3D shape="sphere" color="blue" size="sm" />
                 Account Settings
               </CardTitle>
               <CardDescription className="text-text-secondary">
@@ -119,7 +119,7 @@ export default function SettingsPage() {
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Icon3D shape="capsule" color="orange" size="sm" icon={Bell} />
+                <Icon3D shape="capsule" color="orange" size="sm" />
                 Notifications
               </CardTitle>
               <CardDescription className="text-text-secondary">
@@ -189,7 +189,7 @@ export default function SettingsPage() {
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Icon3D shape="torus" color="green" size="sm" icon={Shield} />
+                <Icon3D shape="torus" color="green" size="sm" />
                 Privacy & Security
               </CardTitle>
               <CardDescription className="text-text-secondary">
@@ -246,7 +246,7 @@ export default function SettingsPage() {
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Icon3D shape="cube" color="purple" size="sm" icon={Smartphone} />
+                <Icon3D shape="cube" color="purple" size="sm" />
                 App Preferences
               </CardTitle>
               <CardDescription className="text-text-secondary">Customize your app experience</CardDescription>
@@ -298,7 +298,7 @@ export default function SettingsPage() {
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
-                <Icon3D shape="sphere" color="blue" size="sm" icon={HelpCircle} />
+                <Icon3D shape="sphere" color="blue" size="sm" />
                 Support & Help
               </CardTitle>
               <CardDescription className="text-text-secondary">
@@ -353,7 +353,7 @@ export default function SettingsPage() {
           <Card className="glass-card border-red-500/30 hover:border-red-500/50 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-red-400">
-                <Icon3D shape="capsule" color="orange" size="sm" icon={LogOut} />
+                <Icon3D shape="capsule" color="orange" size="sm" />
                 Account Actions
               </CardTitle>
               <CardDescription className="text-text-secondary">Manage your account status</CardDescription>

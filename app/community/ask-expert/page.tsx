@@ -178,7 +178,7 @@ export default function AskExpertPage() {
                 </Button>
               </Link>
               <div className="flex items-center gap-2">
-                <Icon3D type="sphere" color="blue" size="sm" />
+                <Icon3D shape="sphere" color="blue" size="sm" />
                 <div>
                   <h1 className="text-2xl font-bold text-white">Ask an Expert</h1>
                   <p className="text-sm text-text-secondary">Get professional guidance from healthcare experts</p>
@@ -195,7 +195,7 @@ export default function AskExpertPage() {
           <div className="lg:col-span-2 space-y-6">
             <div className="glass-card p-6 ring-gradient animate-fade-in-up">
               <div className="flex items-center gap-2 mb-2">
-                <Icon3D type="capsule" color="blue" size="sm" />
+                <Icon3D shape="capsule" color="blue" size="sm" />
                 <h2 className="text-xl font-bold text-white">Ask Your Question</h2>
               </div>
               <p className="text-text-secondary mb-6">Get expert answers to your health questions</p>
@@ -263,7 +263,7 @@ export default function AskExpertPage() {
                   </Button>
                   <Link href="/coaching/schedule">
                     <Button className="btn btn-secondary">
-                      <Icon3D type="cube" color="white" size="xs" className="mr-2" />
+                      <Icon3D shape="cube" color="white" size="sm" className="mr-2" />
                       Schedule 1:1 Session
                     </Button>
                   </Link>
@@ -368,7 +368,7 @@ export default function AskExpertPage() {
 
             <div className="glass-card p-6 ring-gradient animate-fade-in-up">
               <div className="flex items-center gap-2 mb-2">
-                <Icon3D type="cube" color="green" size="sm" />
+                <Icon3D shape="cube" color="green" size="sm" />
                 <h2 className="text-xl font-bold text-white">Upcoming Sessions</h2>
               </div>
 
