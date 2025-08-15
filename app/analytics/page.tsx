@@ -72,14 +72,15 @@ export default function AnalyticsPage() {
         .order("timestamp", { ascending: true })
 
       // Fetch exercise logs (if table exists)
-      const { data: exerciseLogs } = await supabase
+      const { data: exerciseLogs, error: exerciseError } = await supabase
         .from("exercise_logs")
         .select("*")
         .eq("user_id", user.id)
         .gte("timestamp", startDate.toISOString())
         .order("timestamp", { ascending: true })
-        .then((result) => result)
-        .catch(() => ({ data: [] })) // Handle if table doesn't exist
+
+      // Handle if table doesn't exist or other errors
+      const safeExerciseLogs = exerciseError ? [] : exerciseLogs || []
 
       // Calculate analytics
       const avgGlucose = glucoseReadings?.length
@@ -97,7 +98,7 @@ export default function AnalyticsPage() {
         glucoseReadings: glucoseReadings || [],
         weightEntries: weightEntries || [],
         meals: meals || [],
-        exerciseLogs: exerciseLogs || [],
+        exerciseLogs: safeExerciseLogs,
         avgGlucose: Math.round(avgGlucose),
         weightChange: Math.round(weightChange * 2.20462 * 10) / 10, // Convert to lbs
         timeInRange: Math.round(timeInRange),
