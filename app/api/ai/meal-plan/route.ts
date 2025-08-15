@@ -52,12 +52,10 @@ export async function POST(request: NextRequest) {
       maxOutputTokens: 1000,
     })
 
-    // Parse the AI response
     let mealPlan
     try {
       mealPlan = JSON.parse(text)
     } catch (parseError) {
-      // If JSON parsing fails, return a structured error
       return NextResponse.json({ error: "Failed to parse AI response" }, { status: 500 })
     }
 
@@ -67,4 +65,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to generate meal plan" }, { status: 500 })
   }
 }
-</merged_code>

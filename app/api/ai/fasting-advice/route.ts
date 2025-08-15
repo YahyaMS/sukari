@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       model,
       prompt,
       temperature: 0.6,
-      maxOutputTokens: 800, // Added maxOutputTokens for consistent token limiting
+      maxOutputTokens: 800,
     })
 
     let fastingAdvice
@@ -58,4 +58,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to generate fasting advice" }, { status: 500 })
   }
 }
-</merged_code>
