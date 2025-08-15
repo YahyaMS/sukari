@@ -107,9 +107,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
+type RiskLevel = "low" | "medium" | "high" | "critical"
+
 function assessHealthRisk(healthData: HealthData, timeIntoFast: number, session: any): RiskAssessment {
   const riskFactors: string[] = []
-  let riskLevel: "low" | "medium" | "high" | "critical" = "low"
+  let riskLevel: RiskLevel = "low"
   const recommendations: string[] = []
   const interventions: string[] = []
 
@@ -123,12 +125,12 @@ function assessHealthRisk(healthData: HealthData, timeIntoFast: number, session:
       interventions.push("Contact healthcare provider")
     } else if (healthData.glucoseLevel < 70) {
       riskFactors.push("Hypoglycemia (glucose < 70 mg/dL)")
-      riskLevel = Math.max(riskLevel === "low" ? "high" : riskLevel, "high") as any
+      riskLevel = riskLevel === "low" ? "high" : riskLevel === "medium" ? "high" : riskLevel
       recommendations.push("Monitor closely and consider breaking fast")
       recommendations.push("Have glucose tablets readily available")
     } else if (healthData.glucoseLevel < 80) {
       riskFactors.push("Low glucose (glucose < 80 mg/dL)")
-      riskLevel = Math.max(riskLevel === "low" ? "medium" : riskLevel, "medium") as any
+      riskLevel = riskLevel === "low" ? "medium" : riskLevel
       recommendations.push("Monitor glucose levels more frequently")
     }
   }
@@ -141,7 +143,7 @@ function assessHealthRisk(healthData: HealthData, timeIntoFast: number, session:
     if (heartRate) {
       if (heartRate < 50 || heartRate > 120) {
         riskFactors.push(`Abnormal heart rate: ${heartRate} bpm`)
-        riskLevel = Math.max(riskLevel === "low" ? "high" : riskLevel, "high") as any
+        riskLevel = riskLevel === "low" ? "high" : riskLevel === "medium" ? "high" : riskLevel
         recommendations.push("Monitor heart rate closely")
         if (heartRate < 40 || heartRate > 140) {
           riskLevel = "critical"
@@ -154,7 +156,7 @@ function assessHealthRisk(healthData: HealthData, timeIntoFast: number, session:
     if (bloodPressure) {
       if (bloodPressure.systolic < 90 || bloodPressure.diastolic < 60) {
         riskFactors.push("Hypotension detected")
-        riskLevel = Math.max(riskLevel === "low" ? "medium" : riskLevel, "medium") as any
+        riskLevel = riskLevel === "low" ? "medium" : riskLevel
         recommendations.push("Increase fluid and electrolyte intake")
       }
       if (bloodPressure.systolic > 180 || bloodPressure.diastolic > 110) {
@@ -175,7 +177,7 @@ function assessHealthRisk(healthData: HealthData, timeIntoFast: number, session:
     if (bodyTemperature) {
       if (bodyTemperature < 96 || bodyTemperature > 100.4) {
         riskFactors.push("Abnormal body temperature")
-        riskLevel = Math.max(riskLevel === "low" ? "medium" : riskLevel, "medium") as any
+        riskLevel = riskLevel === "low" ? "medium" : riskLevel
         recommendations.push("Monitor temperature and hydration")
       }
     }
@@ -209,7 +211,7 @@ function assessHealthRisk(healthData: HealthData, timeIntoFast: number, session:
       interventions.push("Seek medical attention")
     } else if (hasModerateSymptoms) {
       riskFactors.push("Moderate symptoms reported")
-      riskLevel = Math.max(riskLevel === "low" ? "medium" : riskLevel, "medium") as any
+      riskLevel = riskLevel === "low" ? "medium" : riskLevel
       recommendations.push("Monitor symptoms closely")
       recommendations.push("Consider shortening fast")
     }
@@ -218,7 +220,7 @@ function assessHealthRisk(healthData: HealthData, timeIntoFast: number, session:
   // Energy and mood assessment
   if (healthData.energyLevel && healthData.energyLevel <= 2) {
     riskFactors.push("Very low energy levels")
-    riskLevel = Math.max(riskLevel === "low" ? "medium" : riskLevel, "medium") as any
+    riskLevel = riskLevel === "low" ? "medium" : riskLevel
     recommendations.push("Consider breaking fast if energy doesn't improve")
   }
 
@@ -230,21 +232,21 @@ function assessHealthRisk(healthData: HealthData, timeIntoFast: number, session:
   // Extended fasting duration assessment
   if (timeIntoFast > 24) {
     riskFactors.push("Extended fasting duration (>24 hours)")
-    riskLevel = Math.max(riskLevel === "low" ? "medium" : riskLevel, "medium") as any
+    riskLevel = riskLevel === "low" ? "medium" : riskLevel
     recommendations.push("Enhanced monitoring required for extended fasting")
     recommendations.push("Consider medical supervision")
   }
 
   if (timeIntoFast > 48) {
     riskFactors.push("Very extended fasting duration (>48 hours)")
-    riskLevel = Math.max(riskLevel === "low" ? "high" : riskLevel, "high") as any
+    riskLevel = riskLevel === "low" ? "high" : riskLevel === "medium" ? "high" : riskLevel
     interventions.push("Medical supervision strongly recommended")
   }
 
   // Hydration assessment
   if (healthData.hydrationLevel && healthData.hydrationLevel <= 3) {
     riskFactors.push("Poor hydration levels")
-    riskLevel = Math.max(riskLevel === "low" ? "medium" : riskLevel, "medium") as any
+    riskLevel = riskLevel === "low" ? "medium" : riskLevel
     recommendations.push("Increase water and electrolyte intake immediately")
   }
 

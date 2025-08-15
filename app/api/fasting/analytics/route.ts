@@ -9,6 +9,12 @@ interface AnalyticsRequest {
   includeGoalProgress?: boolean
 }
 
+interface AnalyticsOptions {
+  includeHealthMetrics?: boolean
+  includePredictions?: boolean
+  includeGoalProgress?: boolean
+}
+
 interface FastingAnalytics {
   overview: {
     totalSessions: number
@@ -81,7 +87,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const timeframe = (searchParams.get("timeframe") as any) || "month"
+    const timeframe = (searchParams.get("timeframe") as "week" | "month" | "quarter" | "year" | "all") || "month"
     const includeHealthMetrics = searchParams.get("includeHealthMetrics") === "true"
     const includePredictions = searchParams.get("includePredictions") === "true"
     const includeGoalProgress = searchParams.get("includeGoalProgress") === "true"
@@ -127,11 +133,11 @@ export async function GET(request: NextRequest) {
 }
 
 async function generateFastingAnalytics(
-  sessions: any[],
-  logs: any[],
-  achievements: any[],
+  sessions: Array<Record<string, any>>,
+  logs: Array<Record<string, any>>,
+  achievements: Array<Record<string, any>>,
   timeframe: string,
-  options: any,
+  options: AnalyticsOptions,
 ): Promise<FastingAnalytics> {
   // Filter sessions by timeframe
   const filteredSessions = filterSessionsByTimeframe(sessions, timeframe)
@@ -183,7 +189,10 @@ async function generateFastingAnalytics(
   }
 }
 
-function filterSessionsByTimeframe(sessions: any[], timeframe: string): any[] {
+function filterSessionsByTimeframe(
+  sessions: Array<Record<string, any>>,
+  timeframe: string,
+): Array<Record<string, any>> {
   const now = new Date()
   let cutoffDate: Date
 
@@ -207,7 +216,7 @@ function filterSessionsByTimeframe(sessions: any[], timeframe: string): any[] {
   return sessions.filter((session) => new Date(session.created_at) >= cutoffDate)
 }
 
-function generateOverviewStats(allSessions: any[], completedSessions: any[]) {
+function generateOverviewStats(allSessions: Array<Record<string, any>>, completedSessions: Array<Record<string, any>>) {
   const totalSessions = allSessions.length
   const completedCount = completedSessions.length
   const successRate = totalSessions > 0 ? (completedCount / totalSessions) * 100 : 0
@@ -239,7 +248,7 @@ function generateOverviewStats(allSessions: any[], completedSessions: any[]) {
   }
 }
 
-function calculateCurrentStreak(sessions: any[]): number {
+function calculateCurrentStreak(sessions: Array<Record<string, any>>): number {
   const sortedSessions = sessions
     .filter((s) => s.status === "completed")
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -269,7 +278,7 @@ function calculateCurrentStreak(sessions: any[]): number {
   return streak
 }
 
-function analyzePatterns(completedSessions: any[]) {
+function analyzePatterns(completedSessions: Array<Record<string, any>>) {
   // Analyze fasting types
   const typeStats = new Map<string, { count: number; successful: number }>()
   completedSessions.forEach((session) => {
@@ -358,7 +367,7 @@ function analyzePatterns(completedSessions: any[]) {
   }
 }
 
-function analyzeHealthImpacts(completedSessions: any[], logs: any[]) {
+function analyzeHealthImpacts(completedSessions: Array<Record<string, any>>, logs: Array<Record<string, any>>) {
   // Analyze glucose improvements
   const glucoseSessions = completedSessions.filter((s) => s.glucose_start && s.glucose_end)
   const glucoseReductions = glucoseSessions.map((s) => ({
@@ -436,7 +445,7 @@ function determineHealthTrend(values: number[]): "improving" | "stable" | "decli
   return improvement > 2 ? "improving" : improvement < -2 ? "declining" : "stable"
 }
 
-function generatePredictions(completedSessions: any[], logs: any[]) {
+function generatePredictions(completedSessions: Array<Record<string, any>>, logs: Array<Record<string, any>>) {
   const recentSessions = completedSessions.slice(0, 10)
   const successRate =
     recentSessions.length > 0

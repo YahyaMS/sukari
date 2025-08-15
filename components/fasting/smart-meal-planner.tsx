@@ -38,6 +38,8 @@ interface MealPlan {
   metabolicState: string
 }
 
+type MealType = "pre_fast" | "breaking_fast" | "post_fast" | "regular"
+
 export default function SmartMealPlanner({
   sessionId,
   fastingDuration = 0,
@@ -45,13 +47,11 @@ export default function SmartMealPlanner({
   metabolicState,
   onMealLogged,
 }: SmartMealPlannerProps) {
-  const [selectedMealType, setSelectedMealType] = useState<"pre_fast" | "breaking_fast" | "post_fast" | "regular">(
-    "breaking_fast",
-  )
+  const [selectedMealType, setSelectedMealType] = useState<MealType>("breaking_fast")
   const [mealPlan, setMealPlan] = useState<MealPlan | null>(null)
-  const [hydrationGuidance, setHydrationGuidance] = useState<any>(null)
-  const [electrolyteRecs, setElectrolyteRecs] = useState<any>(null)
-  const [timingGuidance, setTimingGuidance] = useState<any>(null)
+  const [hydrationGuidance, setHydrationGuidance] = useState<Record<string, string> | null>(null)
+  const [electrolyteRecs, setElectrolyteRecs] = useState<Record<string, any> | null>(null)
+  const [timingGuidance, setTimingGuidance] = useState<Record<string, string> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedMeal, setSelectedMeal] = useState<MealRecommendation | null>(null)
   const [mealCompleted, setMealCompleted] = useState<string[]>([])
@@ -223,7 +223,7 @@ export default function SmartMealPlanner({
                 key={type.value}
                 variant={selectedMealType === type.value ? "default" : "outline"}
                 className="h-auto p-4 flex flex-col items-center space-y-2"
-                onClick={() => setSelectedMealType(type.value as any)}
+                onClick={() => setSelectedMealType(type.value as MealType)}
               >
                 <type.icon className="h-5 w-5" />
                 <span className="text-sm">{type.label}</span>

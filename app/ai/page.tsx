@@ -134,13 +134,18 @@ export default function AIPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="mb-4">
-                      <Icon3D shape={feature.shape as any} color={feature.color as any} size="xl" glow />
+                      <Icon3D
+                        shape={feature.shape as "utensils" | "heart" | "capsule" | "sphere" | "cube" | "torus"}
+                        color={feature.color as "green" | "blue" | "purple" | "orange" | "gray" | "gradient"}
+                        size="xl"
+                        glow
+                      />
                     </div>
                     <Badge className="bg-accent-green/20 text-accent-green border-accent-green/30">Ready to help</Badge>
                   </div>
                   <CardTitle className="text-xl text-white">{feature.title}</CardTitle>
                   <CardDescription className="text-gray-300">
-                    {empathicDescriptions[feature.id] || feature.description}
+                    {empathicDescriptions[feature.id as keyof typeof empathicDescriptions] || feature.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -186,7 +191,7 @@ export default function AIPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="mb-4">
-                      <Icon3D shape={feature.shape as any} color="gray" size="xl" />
+                      <Icon3D shape={feature.shape as "cube" | "torus"} color="gray" size="xl" />
                     </div>
                     <Badge variant="outline" className="bg-white/5 border-white/20 text-gray-400">
                       {feature.status}
