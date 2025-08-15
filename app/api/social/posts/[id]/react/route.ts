@@ -1,10 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createServerComponentClient } from "@supabase/ssr"
 import { cookies } from "next/headers"
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const supabase = createServerComponentClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createServerComponentClient({ cookies: () => cookieStore })
 
     // Get current user
     const {
@@ -24,37 +25,60 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       return NextResponse.json({ error: "Invalid reaction type" }, { status: 400 })
     }
 
-    // Check if user already reacted to this post
-    const { data: existingReaction } = await supabase
+    const { data: existingReaction, error: reactionError } = await supabase
       .from("post_reactions")
       .select("id, reaction_type")
       .eq("post_id", postId)
       .eq("user_id", user.id)
-      .single()
+      .maybeSingle()
+
+    if (reactionError) {
+      console.error("Error checking existing reaction:", reactionError)
+      return NextResponse.json({ error: "Database error" }, { status: 500 })
+    }
 
     if (existingReaction) {
       if (existingReaction.reaction_type === reactionType) {
         // Remove reaction if same type
-        await supabase.from("post_reactions").delete().eq("post_id", postId).eq("user_id", user.id)
+        const { error: deleteError } = await supabase
+          .from("post_reactions")
+          .delete()
+          .eq("post_id", postId)
+          .eq("user_id", user.id)
+
+        if (deleteError) {
+          console.error("Error removing reaction:", deleteError)
+          return NextResponse.json({ error: "Failed to remove reaction" }, { status: 500 })
+        }
 
         return NextResponse.json({ reacted: false, reactionType: null })
       } else {
         // Update reaction type
-        await supabase
+        const { error: updateError } = await supabase
           .from("post_reactions")
           .update({ reaction_type: reactionType })
           .eq("post_id", postId)
           .eq("user_id", user.id)
 
+        if (updateError) {
+          console.error("Error updating reaction:", updateError)
+          return NextResponse.json({ error: "Failed to update reaction" }, { status: 500 })
+        }
+
         return NextResponse.json({ reacted: true, reactionType })
       }
     } else {
       // Add new reaction
-      await supabase.from("post_reactions").insert({
+      const { error: insertError } = await supabase.from("post_reactions").insert({
         post_id: postId,
         user_id: user.id,
         reaction_type: reactionType,
       })
+
+      if (insertError) {
+        console.error("Error adding reaction:", insertError)
+        return NextResponse.json({ error: "Failed to add reaction" }, { status: 500 })
+      }
 
       return NextResponse.json({ reacted: true, reactionType })
     }

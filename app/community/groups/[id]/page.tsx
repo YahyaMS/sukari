@@ -157,7 +157,8 @@ export default function GroupPage({ params }: GroupPageProps) {
                 </Button>
               </Link>
               <div className="flex items-center gap-2">
-                <Icon3D type="sphere" color="purple" size="sm" />
+                {/* Fixed type prop to shape prop for Icon3D component */}
+                <Icon3D shape="sphere" color="purple" size="sm" />
                 <div>
                   <h1 className="text-2xl font-bold text-white">{group.name}</h1>
                   <p className="text-sm text-text-secondary">

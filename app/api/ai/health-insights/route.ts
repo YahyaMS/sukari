@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
       model,
       prompt,
       temperature: 0.5,
+      maxOutputTokens: 1200,
     })
 
     let healthInsights
@@ -83,3 +84,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to generate health insights" }, { status: 500 })
   }
 }
+</merged_code>

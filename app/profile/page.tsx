@@ -230,7 +230,6 @@ export default async function ProfilePage() {
             </CardContent>
           </Card>
 
-          {/* ... existing achievements and quick actions cards remain the same ... */}
           <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
@@ -253,7 +252,11 @@ export default async function ProfilePage() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon3D shape={achievement.shape as any} color={achievement.color as any} size="sm" />
+                      <Icon3D
+                        shape={achievement.shape as "sphere" | "cube" | "capsule" | "torus"}
+                        color={achievement.color as "orange" | "green" | "purple" | "blue"}
+                        size="sm"
+                      />
                       <div className="flex-1">
                         <h4
                           className={`font-semibold ${achievement.earned ? "text-accent-green" : "text-text-secondary"}`}
@@ -276,35 +279,33 @@ export default async function ProfilePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <Icon3D shape="capsule" color="orange" size="sm" />
-                Quick Actions
+                Recent Activity
               </CardTitle>
+              <CardDescription className="text-text-secondary">Your latest health tracking activities</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Link href="/profile/medical">
-                  <Button
-                    variant="outline"
-                    className="w-full glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
-                  >
-                    Update Medical Info
-                  </Button>
-                </Link>
-                <Link href="/settings">
-                  <Button
-                    variant="outline"
-                    className="w-full glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
-                  >
-                    Privacy Settings
-                  </Button>
-                </Link>
-                <Link href="/coaching">
-                  <Button
-                    variant="outline"
-                    className="w-full glass-button border-white/20 text-white hover:bg-white/10 bg-transparent"
-                  >
-                    Contact Coach
-                  </Button>
-                </Link>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 glass-card border-white/10 rounded-lg">
+                  <Icon3D shape="sphere" color="blue" size="sm" />
+                  <div className="flex-1">
+                    <p className="text-white font-medium">Glucose Reading Logged</p>
+                    <p className="text-sm text-text-secondary">2 hours ago</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 glass-card border-white/10 rounded-lg">
+                  <Icon3D shape="cube" color="green" size="sm" />
+                  <div className="flex-1">
+                    <p className="text-white font-medium">Weight Updated</p>
+                    <p className="text-sm text-text-secondary">1 day ago</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 glass-card border-white/10 rounded-lg">
+                  <Icon3D shape="torus" color="purple" size="sm" />
+                  <div className="flex-1">
+                    <p className="text-white font-medium">Exercise Session Completed</p>
+                    <p className="text-sm text-text-secondary">3 days ago</p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>

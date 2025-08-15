@@ -57,7 +57,7 @@ For medical questions, remind them to consult their healthcare provider while of
       model,
       system: systemPrompt,
       prompt: message,
-      maxTokens: 500,
+      maxOutputTokens: 500,
     })
 
     return NextResponse.json({ response: text })

@@ -43,37 +43,57 @@ export default async function DashboardPage() {
   const userAchievements = (await gamificationService.getUserAchievements(user.id)) || []
   const recentHPActivities = (await gamificationService.getRecentHPActivities(user.id, 5)) || []
 
-  // Fetch user profile
-  const { data: profile } = await supabase.from("user_profiles").select("*").eq("id", user.id).single()
+  // Fetch user profile with proper error handling and null safety
+  const { data: profile, error: profileError } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("id", user.id)
+    .maybeSingle()
 
-  // Fetch latest health data
-  const { data: latestGlucose } = await supabase
+  if (profileError) {
+    console.error("Error fetching profile:", profileError)
+  }
+
+  // Fetch latest health data with proper error handling
+  const { data: latestGlucose, error: glucoseError } = await supabase
     .from("glucose_readings")
     .select("*")
     .eq("user_id", user.id)
     .order("timestamp", { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle()
 
-  const { data: latestWeight } = await supabase
+  if (glucoseError) {
+    console.error("Error fetching glucose data:", glucoseError)
+  }
+
+  const { data: latestWeight, error: weightError } = await supabase
     .from("weight_entries")
     .select("*")
     .eq("user_id", user.id)
     .order("timestamp", { ascending: false })
     .limit(1)
-    .single()
+    .maybeSingle()
 
-  // Fetch today's meals for carb calculation
+  if (weightError) {
+    console.error("Error fetching weight data:", weightError)
+  }
+
+  // Fetch today's meals for carb calculation with proper error handling
   const today = new Date().toISOString().split("T")[0]
-  const { data: todayMeals } = await supabase
+  const { data: todayMeals, error: mealsError } = await supabase
     .from("meals")
     .select("total_carbs")
     .eq("user_id", user.id)
     .gte("timestamp", `${today}T00:00:00`)
     .lte("timestamp", `${today}T23:59:59`)
 
-  // Fetch recent notifications
-  const { data: notificationsData } = await supabase
+  if (mealsError) {
+    console.error("Error fetching meals data:", mealsError)
+  }
+
+  // Fetch recent notifications with proper error handling
+  const { data: notificationsData, error: notificationsError } = await supabase
     .from("notifications")
     .select("*")
     .eq("user_id", user.id)
@@ -81,11 +101,19 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(10)
 
-  const { data: friendRequestsData } = await supabase
+  if (notificationsError) {
+    console.error("Error fetching notifications:", notificationsError)
+  }
+
+  const { data: friendRequestsData, error: friendRequestsError } = await supabase
     .from("friend_requests")
     .select("*")
     .eq("recipient_id", user.id)
     .eq("status", "pending")
+
+  if (friendRequestsError) {
+    console.error("Error fetching friend requests:", friendRequestsError)
+  }
 
   const notifications = notificationsData || []
   const friendRequests = friendRequestsData || []

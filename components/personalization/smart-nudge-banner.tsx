@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { X, Bell, Target, TrendingUp, Trophy } from "lucide-react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createClientComponentClient } from "@supabase/ssr"
 
 interface SmartNudge {
   id: string
@@ -26,29 +26,50 @@ export function SmartNudgeBanner() {
   }, [])
 
   const fetchNudges = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
 
-    const { data } = await supabase
-      .from("smart_nudges")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("status", "pending")
-      .order("priority", { ascending: false })
-      .limit(3)
+      const { data, error } = await supabase
+        .from("smart_nudges")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("status", "pending")
+        .order("priority", { ascending: false })
+        .limit(3)
 
-    if (data) {
-      setNudges(data)
+      if (error) {
+        console.error("Error fetching nudges:", error)
+        return
+      }
+
+      if (data) {
+        setNudges(data)
+      }
+    } catch (error) {
+      console.error("Error in fetchNudges:", error)
     }
   }
 
   const dismissNudge = async (nudgeId: string) => {
     setDismissedNudges((prev) => new Set([...prev, nudgeId]))
 
-    // Update in database
-    await supabase.from("smart_nudges").update({ status: "dismissed" }).eq("id", nudgeId)
+    try {
+      const { error } = await supabase.from("smart_nudges").update({ status: "dismissed" }).eq("id", nudgeId)
+
+      if (error) {
+        console.error("Error dismissing nudge:", error)
+        setDismissedNudges((prev) => {
+          const newSet = new Set(prev)
+          newSet.delete(nudgeId)
+          return newSet
+        })
+      }
+    } catch (error) {
+      console.error("Error in dismissNudge:", error)
+    }
   }
 
   const getIcon = (type: string) => {

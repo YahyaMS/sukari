@@ -2,20 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import {
-  ArrowLeft,
-  Users,
-  MessageCircle,
-  Trophy,
-  Lightbulb,
-  Heart,
-  TrendingUp,
-  Sparkles,
-  Bot,
-  Star,
-  Calendar,
-  Award,
-} from "lucide-react"
+import { ArrowLeft, Users, MessageCircle, Trophy, Lightbulb, Heart, TrendingUp, Sparkles, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -139,7 +126,7 @@ export default function CommunityPage() {
                 </Button>
               </Link>
               <div className="flex items-center gap-3">
-                <Icon3D shape="sphere" color="purple" size="sm" icon={Users} />
+                <Icon3D shape="sphere" color="purple" size="sm" />
                 <div>
                   <h1 className="text-2xl font-bold text-white">Community</h1>
                   <p className="text-sm text-text-secondary">Connect, share, and grow together</p>
@@ -152,7 +139,7 @@ export default function CommunityPage() {
                 <span>{communityStats.totalMembers.toLocaleString()} members</span>
               </div>
               <div className="flex items-center gap-2">
-                <Icon3D shape="heart" color="blue" size="sm" icon={Heart} />
+                <Icon3D shape="heart" color="blue" size="sm" />
                 <span className="font-semibold text-white">MetaReverse</span>
               </div>
             </div>
@@ -206,7 +193,7 @@ export default function CommunityPage() {
             <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <Icon3D shape="cube" color="purple" size="sm" icon={Bot} />
+                  <Icon3D shape="cube" color="purple" size="sm" />
                   AI Community Insights
                   <Badge className="ml-2 bg-accent-purple/20 text-accent-purple border-accent-purple/30">
                     <Sparkles className="h-3 w-3 mr-1" />
@@ -233,7 +220,7 @@ export default function CommunityPage() {
             <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <Icon3D shape="torus" color="orange" size="sm" icon={Trophy} />
+                  <Icon3D shape="torus" color="orange" size="sm" />
                   Featured Success Stories
                 </CardTitle>
                 <CardDescription className="text-text-secondary">
@@ -298,7 +285,7 @@ export default function CommunityPage() {
             <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <Icon3D shape="sphere" color="blue" size="sm" icon={Users} />
+                  <Icon3D shape="sphere" color="blue" size="sm" />
                   AI-Matched Support Groups
                   <Badge className="ml-2 bg-accent-blue/20 text-accent-blue border-accent-blue/30">
                     <Sparkles className="h-3 w-3 mr-1" />
@@ -363,7 +350,7 @@ export default function CommunityPage() {
             <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
-                  <Icon3D shape="capsule" color="green" size="sm" icon={MessageCircle} />
+                  <Icon3D shape="capsule" color="green" size="sm" />
                   Quick Actions
                 </CardTitle>
               </CardHeader>
@@ -398,7 +385,7 @@ export default function CommunityPage() {
             <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <Icon3D shape="cube" color="blue" size="sm" icon={Calendar} />
+                  <Icon3D shape="cube" color="blue" size="sm" />
                   Upcoming Events
                 </CardTitle>
               </CardHeader>
@@ -430,7 +417,7 @@ export default function CommunityPage() {
             <Card className="glass-card border-white/10 hover:border-white/20 transition-all duration-300">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-white">
-                  <Icon3D shape="torus" color="orange" size="sm" icon={Award} />
+                  <Icon3D shape="torus" color="orange" size="sm" />
                   Community Champions
                 </CardTitle>
               </CardHeader>
@@ -465,3 +452,4 @@ export default function CommunityPage() {
     </div>
   )
 }
+</merged_code>

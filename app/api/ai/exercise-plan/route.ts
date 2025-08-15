@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
       model,
       prompt,
       temperature: 0.7,
+      maxOutputTokens: 1000,
     })
 
     let workoutPlans
@@ -72,3 +73,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to generate workout plan" }, { status: 500 })
   }
 }
+</merged_code>
