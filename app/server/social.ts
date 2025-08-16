@@ -1,11 +1,25 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createServerClient } from "@supabase/ssr"
 
 export async function getFriends() {
   try {
-    const supabase = createServerComponentClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            // Server actions can't set cookies
+          },
+        },
+      },
+    )
 
     const {
       data: { user },
@@ -32,7 +46,21 @@ export async function getFriends() {
 
 export async function getFriendRequests() {
   try {
-    const supabase = createServerComponentClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            // Server actions can't set cookies
+          },
+        },
+      },
+    )
 
     const {
       data: { user },
@@ -59,7 +87,21 @@ export async function getFriendRequests() {
 
 export async function getSocialFeed() {
   try {
-    const supabase = createServerComponentClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            // Server actions can't set cookies
+          },
+        },
+      },
+    )
 
     const {
       data: { user },
@@ -86,7 +128,21 @@ export async function getSocialFeed() {
 
 export async function sendFriendRequest(friendId: string) {
   try {
-    const supabase = createServerComponentClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            // Server actions can't set cookies
+          },
+        },
+      },
+    )
 
     const {
       data: { user },

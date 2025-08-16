@@ -8,7 +8,21 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: () => cookieStore },
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            // Server components can't set cookies, but this is required by the interface
+            try {
+              cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
+            } catch {
+              // Ignore cookie setting errors in server components
+            }
+          },
+        },
+      },
     )
 
     // Check if user is authenticated

@@ -1,10 +1,18 @@
 import "server-only"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createServerClient } from "@supabase/ssr"
+import { cookies } from "next/headers"
 
-// Type-safe reference to Next's cookies() function (erased at build time)
-export type CookiesFn = typeof import("next/headers").cookies
+export function supabaseServer() {
+  const cookieStore = cookies()
 
-// Factory: creates a Supabase client that can read auth cookies on the server
-export function supabaseServer(cookiesFn: CookiesFn) {
-  return createServerComponentClient({ cookies: cookiesFn })
+  return createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet) {
+        // Server components can't set cookies
+      },
+    },
+  })
 }
