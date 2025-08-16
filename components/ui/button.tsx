@@ -14,7 +14,7 @@ const buttonVariants = cva(
         destructive:
           "bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl shadow-medium hover:shadow-lg hover:scale-105 active:scale-95",
         outline:
-          "glass-card border border-white/20 text-text-primary rounded-2xl hover:bg-white/10 hover:border-white/30 hover:scale-105 active:scale-95",
+          "bg-white/5 backdrop-blur-md border border-white/20 text-text-primary rounded-2xl hover:bg-white/10 hover:border-white/30 hover:scale-105 active:scale-95",
         secondary:
           "bg-white/10 text-text-secondary rounded-2xl backdrop-blur-sm border border-white/10 hover:bg-white/15 hover:scale-105 active:scale-95",
         ghost: "text-text-primary rounded-2xl hover:bg-white/10 hover:backdrop-blur-sm hover:scale-105 active:scale-95",

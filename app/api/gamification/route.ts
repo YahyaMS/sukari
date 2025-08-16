@@ -14,10 +14,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const [gamification, achievements] = await Promise.all([
-      getUserGamification(cookies, user.id),
-      getUserAchievements(cookies, user.id),
-    ])
+    const [gamification, achievements] = await Promise.all([getUserGamification(), getUserAchievements()])
 
     return NextResponse.json({
       gamification,

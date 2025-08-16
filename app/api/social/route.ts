@@ -15,9 +15,9 @@ export async function GET() {
     }
 
     const [friends, friendRequests, socialFeed] = await Promise.all([
-      getUserFriends(cookies, user.id),
-      getFriendRequests(cookies, user.id),
-      getSocialFeed(cookies, user.id),
+      getUserFriends(),
+      getFriendRequests(),
+      getSocialFeed(),
     ])
 
     return NextResponse.json({
