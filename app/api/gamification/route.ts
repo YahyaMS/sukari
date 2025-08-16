@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { getUserGamification, getUserAchievements } from "@/lib/gamification"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createServerClient } from "@supabase/ssr"
 
 export async function GET() {
   try {
-    const supabase = createServerComponentClient({ cookies })
+    const cookieStore = cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: () => cookieStore },
+    )
+
     const {
       data: { user },
     } = await supabase.auth.getUser()
